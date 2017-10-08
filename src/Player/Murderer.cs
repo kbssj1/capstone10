@@ -6,6 +6,7 @@ public class Murderer : MonoBehaviour, IListener
     private const int MurderDamage = 25;
     private const float SpeedRotationInit = 50;
     private const float MurderSpeedInit = 1.5f;
+	private const float MoveDirectionInit = 9.8;
     private enum PlayerState { Idle = 0, Walk = 1, Run = 2, Attack = 3, Die = 4 };
 
     [Header("Canvas Settings")]
@@ -131,7 +132,7 @@ public class Murderer : MonoBehaviour, IListener
                 Vector3 desiredMove = transform.forward * Vertical + transform.right * Horizontal;
 
                 MoveDirection.x = desiredMove.x * Speed;
-                MoveDirection.y -= 9.8f;
+                MoveDirection.y -= MoveDirectionInit;
                 MoveDirection.z = desiredMove.z * Speed;
 
                 Controller.Move(MoveDirection * Time.deltaTime);
