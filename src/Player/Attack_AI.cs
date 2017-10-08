@@ -26,14 +26,14 @@ public class Attack_AI : MonoBehaviour {
 
     void Start()
     {
-        attack_audio.PlayAudio("START", true);
+        attack_audio.PlayAudio(AudioController.AudioType.CHAINSSAW_START, true);
     }
 
 
     public void PlayNormalAudio()
     {
         if (attack_audio.GetCheck())
-            attack_audio.PlayAudio("NORMAL");
+            attack_audio.PlayAudio(AudioController.AudioType.CHAINSSAW_IDLE);
     }
 
     protected IEnumerator Block2Attack()

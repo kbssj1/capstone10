@@ -14,15 +14,15 @@ public class Attack_Audio : AudioController
         base.Init();
     }
 
-    public void PlayAudio(string audioName, bool Rightly = false)
+    public void PlayAudio(AudioType attackType, bool Rightly = false)
     {
         if (audioSource != null)
         {
             if (Rightly == false)
             {
-                switch (audioName)
+                switch (attackType)
                 {
-                    case "NORMAL":
+                    case AudioType.CHAINSSAW_IDLE:
                         audioSource.clip = Audio_Attack_Normal;
                         break;
                     default:
@@ -36,17 +36,20 @@ public class Attack_Audio : AudioController
             }
             else
             {
-                switch (audioName)
+                switch (attackType)
                 {
-                    case "START":                      
+                    case AudioType.CHAINSSAW_IDLE:
                         audioSource.clip = Audio_Attack_Start;
                         if (audioSource.clip != null)
                             StartCoroutine(TestAudio(audioSource.clip.length));
                         break;
-                    case "ATTACK":
-                        audioSource.clip = Audio_Attack_Attack;
-                        if (audioSource.clip != null)
-                            StartCoroutine(TestAudio(1.2f));
+                    case AudioType.CHAINSSAW_ATTACK:
+                        if (GetCheck())
+                        {
+                            audioSource.clip = Audio_Attack_Attack;
+                            if (audioSource.clip != null)
+                                StartCoroutine(TestAudio(1.2f));
+                        }
                         break;
                     default:
                         Debug.LogError("잘못된 오디오 명을 입력하셨습니다.(Attack)");

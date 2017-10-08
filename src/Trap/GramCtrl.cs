@@ -40,26 +40,18 @@ public class GramCtrl : MonoBehaviour, IListener
             Vector3 viewPos = Camera.main.WorldToViewportPoint(Object.GetComponent<Transform>().position); // 카메라 뷰포트로 변환
 
          
-            if (possible && viewPos.x > 0.1f && viewPos.x < 0.9f && viewPos.y > 0.1f && viewPos.y < 0.9f)
-            {
-
-                if (Input.GetButtonDown("Fire2"))
-                {
-
-                    if (survivor != null && survivor.getGramCtrl())
+            if (possible && viewPos.x > 0.1f && viewPos.x < 0.9f && viewPos.y > 0.1f && viewPos.y < 0.9f && Input.GetButtonDown("Fire2") && survivor != null)
+            {              
+                    if (survivor.getGramCtrl())
                     {
                         sw.Stop();
-
                     }
-                    else if (survivor != null && !survivor.getGramCtrl())
+                    else if (!survivor.getGramCtrl())
                     {
                         sw.Start();
                     }
-
                     survivor.GetComponent<GramTrap>().enabled = true;
-                    EventManager.Instance.PostNotification(EVENT_TYPE.SURVIVOR_GRAMCTRL, this);
-                }
-                
+                    EventManager.Instance.PostNotification(EVENT_TYPE.SURVIVOR_GRAMCTRL, this);              
             }
             
             yield return null;
@@ -140,7 +132,7 @@ public class GramCtrl : MonoBehaviour, IListener
             case EVENT_TYPE.SURVIVOR_CREATE:
 
                 survivor = GameObject.FindGameObjectWithTag("SURVIVOR").GetComponent<Survivor>();
-                if (survivor.m_pv.isMine)
+                if (survivor.Pv.isMine)
                 {
                     StartCoroutine(CheckGramCtrl()); //코루틴 실행
 
@@ -150,7 +142,7 @@ public class GramCtrl : MonoBehaviour, IListener
 
             case EVENT_TYPE.MURDERER_CREATE:
                 Murderer murder= GameObject.FindGameObjectWithTag("MURDERER").GetComponent<Murderer>();
-                if(murder.m_pv.isMine)
+                if(murder.Pv.isMine)
                     outLine.enabled = false;
 
                 break;

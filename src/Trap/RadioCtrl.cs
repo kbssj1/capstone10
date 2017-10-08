@@ -34,24 +34,15 @@ public class RadioCtrl : MonoBehaviour, IListener
 
             if (possible && viewPos.x > 0.1f && viewPos.x < 0.9f && viewPos.y > 0.1f && viewPos.y < 0.9f)
             {
-
                 if (Input.GetButtonDown("Fire2"))
                 {
-
-
                     survivor.GetComponent<RadioTrap>().enabled = true;
                     EventManager.Instance.PostNotification(EVENT_TYPE.SURVIVOR_RADIOCTRL, this);
-
                 }
-
-
-
                 float _input = Input.GetAxis("Oculus_GearVR_DpadY");//Oculus_GearVR_DpadX
 
                 if (survivor != null && survivor.getRadioCtrl() && _input < -0.5f)
                 {
-
-
                     EventManager.Instance.PostNotification(EVENT_TYPE.SURVIVOR_RADIOCTRL, this, _input);
                     if (cnt >= 8)
                     {
@@ -102,7 +93,7 @@ public class RadioCtrl : MonoBehaviour, IListener
             case EVENT_TYPE.SURVIVOR_CREATE:
 
                 survivor = GameObject.FindGameObjectWithTag("SURVIVOR").GetComponent<Survivor>();
-                if (survivor.m_pv.isMine)
+                if (survivor.Pv.isMine)
                 {
                     StartCoroutine(CheckRadioCtrl()); //코루틴 실행
 
@@ -112,7 +103,7 @@ public class RadioCtrl : MonoBehaviour, IListener
             case EVENT_TYPE.MURDERER_CREATE:
 
                 Murderer murder = GameObject.FindGameObjectWithTag("MURDERER").GetComponent<Murderer>();
-                if (murder.m_pv.isMine)
+                if (murder.Pv.isMine)
                     outLine.enabled = false;
 
                 break;

@@ -27,7 +27,7 @@ public class Attack : MonoBehaviour {
     }
 
 
-    public void PlayNormalAudio()
+    public void PlayWeaponIdleAudio()
     {
         if (attack_audio.GetCheck())
             attack_audio.PlayAudio("NORMAL");

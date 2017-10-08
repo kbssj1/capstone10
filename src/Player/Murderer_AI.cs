@@ -7,12 +7,12 @@ public class Murderer_AI : MonoBehaviour, IListener {
 	Transform[] patrolPos;
 
 	NavMeshAgent _naviAgnt;
-	Animator _animator;
-	public bool isAttacking = false;
+	Animator Animator;
+	public bool Attacking = false;
 	public Transform currentPatPos;
 	public Transform tracePos;
-    private bool isAttack;
-    private int m_Damage;
+    private bool Attack22;
+    private int Damage;
     public Murderer_STATE murder_state;
     // Use this for initialization
     void Start () {
@@ -20,16 +20,16 @@ public class Murderer_AI : MonoBehaviour, IListener {
         EventManager.Instance.AddListener(EVENT_TYPE.TIME_START, this);
         EventManager.Instance.AddListener(EVENT_TYPE.SURVIVOR_DIE, this);
         
-        isAttack = false;
-        m_Damage = 25;
+        Attack22 = false;
+        Damage = 25;
 		_naviAgnt = GetComponent<NavMeshAgent> ();
-		_animator = GetComponent<Animator> ();
+		Animator = GetComponent<Animator> ();
 	}
 	IEnumerator Walk(){
 
 		_naviAgnt.Stop ();
 		_naviAgnt.Resume();
-		_animator.SetTrigger ("Walk");
+		Animator.SetTrigger ("Walk");
 
         int index = (int)Random.Range (0, patrolPos.Length);
 		currentPatPos = patrolPos [index];
@@ -40,7 +40,7 @@ public class Murderer_AI : MonoBehaviour, IListener {
 	IEnumerator Run(){
 		_naviAgnt.Stop ();
 		_naviAgnt.Resume();
-		_animator.SetTrigger ("Run");
+		Animator.SetTrigger ("Run");
 
 
 		_naviAgnt.SetDestination (tracePos.position);
@@ -49,22 +49,22 @@ public class Murderer_AI : MonoBehaviour, IListener {
 	}
 	IEnumerator Attack1(){
 		_naviAgnt.Stop ();
-		_animator.SetTrigger ("Attack1");
+		Animator.SetTrigger ("Attack1");
 		yield return null;
 	}
 	IEnumerator Attack2(){
 		_naviAgnt.Stop ();
-		_animator.SetTrigger ("Attack2");
+		Animator.SetTrigger ("Attack2");
 		yield return null;
 	}
 	IEnumerator Attack3(){
 		_naviAgnt.Stop ();
-		_animator.SetTrigger ("Attack3");
+		Animator.SetTrigger ("Attack3");
 		yield return null;
 	}
 	IEnumerator Idle(){
 		_naviAgnt.Stop ();
-		_animator.SetTrigger ("Idle");
+		Animator.SetTrigger ("Idle");
 		yield return null;
 
 	}
@@ -77,8 +77,8 @@ public class Murderer_AI : MonoBehaviour, IListener {
 	}
 	public void Attack(Transform _survivor){
         
-		if (!isAttacking) {
-			isAttacking = true;
+		if (!Attacking) {
+			Attacking = true;
             int tmpRandomAttackIndex = (int)Random.Range (1, 4);
 			this.transform.LookAt (_survivor.position);
 			StartCoroutine ("Attack" + tmpRandomAttackIndex);
@@ -94,20 +94,20 @@ public class Murderer_AI : MonoBehaviour, IListener {
 	}
     public Animator GetAni()
     {
-        return _animator;
+        return Animator;
     }
     public bool getAttacked()
     {
-        return isAttack;
+        return Attack22;
     }
     public void OnAttackEnd()
     {
 
-        isAttack = false;
+        Attack22 = false;
     }
     public int getDamage()
     {
-        return m_Damage;
+        return Damage;
     }
     public void OnEvent(EVENT_TYPE Event_Type, Component Sender, object Param)
     {
@@ -130,7 +130,7 @@ public class Murderer_AI : MonoBehaviour, IListener {
     }
     public void OnAttackStart()
     {
-        isAttack = true;
+        Attack22 = true;
     }
     void OnTimmerEnd()
     {

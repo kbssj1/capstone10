@@ -4,7 +4,7 @@ using UnityEngine;
 
 public class AudioController : MonoBehaviour
 {
-
+    public enum AudioType { NOT, MURDER_ATTACK, MURDER_RUN, MURDER_WALK, MURDER_DEATH,CHAINSSAW_ATTACK,CHAINSSAW_IDLE, CHAINSSAW_START }
     public AudioSource audioSource;
     protected bool Check = true;
 

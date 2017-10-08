@@ -44,22 +44,6 @@ public class Murderer_STATE : MonoBehaviour {
 		catch(Exception e){
 			Debug.LogError (e);
 		}
-        #region
-
-        if (_ai.GetAni().GetCurrentAnimatorStateInfo(0).IsName("Walk"))
-        {
-            murder_Audio.PlayAudio("WALK");
-        }
-        else if (_ai.GetAni().GetCurrentAnimatorStateInfo(0).IsName("Run"))
-        {
-            murder_Audio.PlayAudio("RUN");
-        }
-        else
-        {
-            murder_Audio.PlayAudio("NOT");
-        }
-
-        #endregion
     }
     IEnumerator StateChanger(){
 		while (true) {
@@ -83,15 +67,15 @@ public class Murderer_STATE : MonoBehaviour {
 					_ai.StopAIRoutine ();
 					_ai.Stop ();
 				}
-				if (_state == MurdererAIState.PATROL && (_survivor.m_PlayerState == Survivor.PlayerState.Run || _survivor.m_PlayerState == Survivor.PlayerState.Gram
-                    || _survivor.m_PlayerState == Survivor.PlayerState.Radio || _survivor.m_PlayerState == Survivor.PlayerState.Key)) {
+				if (_state == MurdererAIState.PATROL && (_survivor.Playerstate == Survivor.PlayerState.Run || _survivor.Playerstate == Survivor.PlayerState.Gram
+                    || _survivor.Playerstate == Survivor.PlayerState.Radio || _survivor.Playerstate == Survivor.PlayerState.Key)) {
 					_state = MurdererAIState.TRACE;
 					_ai.StopAIRoutine ();
 					_ai.tracePos.position = _survivor.transform.position;
 					_ai.Trace ();
 				}
-				if (_state == MurdererAIState.IDLE && (_survivor.m_PlayerState == Survivor.PlayerState.Run || _survivor.m_PlayerState == Survivor.PlayerState.Gram
-                    || _survivor.m_PlayerState == Survivor.PlayerState.Radio || _survivor.m_PlayerState == Survivor.PlayerState.Key)) {
+				if (_state == MurdererAIState.IDLE && (_survivor.Playerstate == Survivor.PlayerState.Run || _survivor.Playerstate == Survivor.PlayerState.Gram
+                    || _survivor.Playerstate == Survivor.PlayerState.Radio || _survivor.Playerstate == Survivor.PlayerState.Key)) {
 					_state = MurdererAIState.TRACE;
 					_ai.StopAIRoutine ();
 					_ai.tracePos.position = _survivor.transform.position;
@@ -117,6 +101,6 @@ public class Murderer_STATE : MonoBehaviour {
 	}
 	public void OnShoutEnd(){
 		_state = MurdererAIState.IDLE;
-		_ai.isAttacking = false;
+		_ai.Attacking = false;
 	}
 }

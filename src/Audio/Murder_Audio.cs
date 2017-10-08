@@ -16,21 +16,21 @@ public class Murder_Audio : AudioController
         base.Init();
     }
 
-    public void PlayAudio(string audioName, bool isOneSound = false)
+    public void PlayAudio(AudioType audiotype, bool isOneSound = false)
     {
         if (audioSource != null)
         {
             if (isOneSound == false)
             {
-                switch (audioName)
+                switch (audiotype)
                 {
-                    case "RUN":
+                    case AudioType.MURDER_RUN:
                         audioSource.clip = Audio_Run;
                         break;
-                    case "WALK":
+                    case AudioType.MURDER_WALK:
                         audioSource.clip = Audio_Walk;
                         break;
-                    case "NOT":
+                    case AudioType.NOT:
                         audioSource.clip = null;
                         audioSource.Stop();
                         break;
@@ -42,13 +42,16 @@ public class Murder_Audio : AudioController
             }
             else
             {
-                switch (audioName)
+                switch (audiotype)
                 {
-                    case "ATTACK":
-                        audioSource.clip = Audio_Attack_cry;
-                        playTime = 1.2f;
+                    case AudioType.MURDER_ATTACK:
+                        if (GetCheck())
+                        { 
+                            audioSource.clip = Audio_Attack_cry;
+                            playTime = 1.2f;
+                        }
                         break;
-                    case "DEATH":
+                    case AudioType.MURDER_DEATH:
                         if (RepeatCheck_Death == true)
                         {
                             audioSource.clip = Audio_Death;

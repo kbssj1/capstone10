@@ -30,15 +30,12 @@ public class KeyItem : MonoBehaviour, IListener
             Vector3 viewPos = Camera.main.WorldToViewportPoint(Object.GetComponent<Transform>().position); // 카메라 뷰포트로 변환
 
            
-            if (possible && viewPos.x > 0.1f && viewPos.x < 0.9f && viewPos.y > 0.1f && viewPos.y < 0.9f)
+            if (possible && viewPos.x > 0.1f && viewPos.x < 0.9f && viewPos.y > 0.1f && viewPos.y < 0.9f && Input.GetButtonDown("Fire2"))
             {
               
-                if (Input.GetButtonDown("Fire2"))
-                {
-                    
-                    EventManager.Instance.PostNotification(EVENT_TYPE.KEY_GET, this);
+                EventManager.Instance.PostNotification(EVENT_TYPE.KEY_GET, this);
 
-                }
+                
             }
 
             yield return null;
@@ -86,7 +83,7 @@ public class KeyItem : MonoBehaviour, IListener
 
             case EVENT_TYPE.RADIO_OPEN_KEY:
 
-                if (survivor.m_pv.isMine)
+                if (survivor.Pv.isMine)
                 {
                     open = true;
                     StartCoroutine(CheckKeyItem()); //코루틴 실행

@@ -19,7 +19,7 @@ public class RadioEnd : StateMachineBehaviour {
         Survivor survivor = GameObject.FindGameObjectWithTag("SURVIVOR").GetComponent<Survivor>();
         RadioCtrl Radio = GameObject.FindGameObjectWithTag("RADIO").GetComponent<RadioCtrl>();
         Radio.cnt++;
-        survivor.m_Animator.SetBool("RadioCtrl", false);
+        survivor.Animator.SetBool("RadioCtrl", false);
         GameInformation.cnt_value = Radio.cnt;
     }
 
