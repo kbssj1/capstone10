@@ -4,10 +4,10 @@ using UnityEngine;
 
 public class MurdererCountDown : MonoBehaviour {
 
-    public Murderer _murderer;
+    public Murderer murderer;
     public void OnCountDownEnd()
     {
         print("CountDownEndFirst");
-        _murderer.OnCountEnd();
+        murderer.OnCountEnd();
     }
 }

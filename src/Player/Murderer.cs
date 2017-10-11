@@ -3,41 +3,50 @@ using System.Collections;
 
 public class Murderer : MonoBehaviour, IListener
 {
-    private const int MurderDamage = 25;
-    private const float SpeedRotationInit = 50;
-    private const float MurderSpeedInit = 1.5f;
-	private const float MoveDirectionInit = 9.8;
-    private enum PlayerState { Idle = 0, Walk = 1, Run = 2, Attack = 3, Die = 4 };
+    private const int murderDamage = 25;
+    private const float speedRotationInit = 50;
+    private const float murderSpeedInit = 1.5f;
+    private enum PlayerState { Idle = 0, Walk = 1, Run = 2, Attack = 3, die = 4 };
 
     [Header("Canvas Settings")]
-    public Transform GameOver;
-    public Transform CountDown;
+    [SerializeField]
+    private Transform gameOver;
+    [SerializeField]
+    private Transform countDown;
 
     [Header("Animation Settings")]
-    public Animator Animator;
-    private PlayerState Playerstate;
-    private int State;
+    [SerializeField]
+    private Animator ani;
+    private PlayerState playerstate;
+    private int state;
     [Header("Controller Settings")]
-    public CharacterController Controller;
-    public Transform PlayerTr;
-    public float SpeedRotation = SpeedRotationInit;
-    public float WalkSpeed;
-    public float RunSpeed;
-    private float Speed = MurderSpeedInit;
+    [SerializeField]
+    private CharacterController Controller;
+    [SerializeField]
+    private Transform playerTr;
+    [SerializeField]
+    private float SpeedRotation = speedRotationInit;
+    [SerializeField]
+    private float walkSpeed;
+    [SerializeField]
+    private float runSpeed;
+    [SerializeField]
+    private float Speed = murderSpeedInit;
 
-    private Vector3 MoveDirection = Vector3.zero;
-    private float Horizontal = 0f;
-    private float Vertical = 0f;
-    private float Rotate;
+    private Vector3 moveDirection = Vector3.zero;
+    private float horizontal = 0f;
+    private float vertical = 0f;
+    private float rotate;
 
     [Header("Character Settings")]
-    public bool Die;
+    private bool die;
     private bool Attack;
     private bool Run;
     private int Damage;
 
     [Header("Photon Settings")]
-    public GameObject Camera;
+    [SerializeField]
+    private GameObject Camera;
     public PhotonView Pv;
     private Vector3 currPos = Vector3.zero;
     private Quaternion currRot = Quaternion.identity;
@@ -53,36 +62,36 @@ public class Murderer : MonoBehaviour, IListener
 
     private bool gameStart;
     [SerializeField]
-    private SkinnedMeshRenderer SurSkin1;
+    private SkinnedMeshRenderer surSkin1;
     [SerializeField]
-    private SkinnedMeshRenderer SurSkin2;
+    private SkinnedMeshRenderer surSkin2;
     [SerializeField]
-    private MeshRenderer SurEyesR;
+    private MeshRenderer surEyesR;
     [SerializeField]
-    private MeshRenderer SurEyesL;
+    private MeshRenderer surEyesL;
     [SerializeField]
-    private MeshRenderer SurMouseLTeeth;
+    private MeshRenderer surMouseLTeeth;
     [SerializeField]
-    private MeshRenderer SurMouseUTeeth;
+    private MeshRenderer surMouseUTeeth;
     [SerializeField]
-    private MeshRenderer SurMouseTongue;
+    private MeshRenderer surMouseTongue;
 
     // Use this for initialization
     void Awake()
     {
 
-        Die = false;
+        die = false;
         Attack = false;
         Run = false;
-        Damage = MurderDamage;
-        Playerstate = PlayerState.Idle;
-        State = 0;
+        Damage = murderDamage;
+        playerstate = PlayerState.Idle;
+        state = 0;
         Pv.synchronization = ViewSynchronization.UnreliableOnChange;
 
         Pv.ObservedComponents[0] = this;
 
-        currPos = PlayerTr.position;
-        currRot = PlayerTr.rotation;
+        currPos = playerTr.position;
+        currRot = playerTr.rotation;
 
         gameStart = false;
 
@@ -113,13 +122,13 @@ public class Murderer : MonoBehaviour, IListener
     #region
     void Update()
     {
-        if (!Die && !Attack && gameStart)
+        if (!die && !Attack && gameStart)
         {
             if (Pv.isMine)
             {
-                Horizontal = Input.GetAxis("Horizontal");
-                Vertical = Input.GetAxis("Vertical");
-                Rotate = Input.GetAxis("Oculus_GearVR_RThumbstickX") * SpeedRotation; // 회전
+                horizontal = Input.GetAxis("horizontal");
+                vertical = Input.GetAxis("vertical");
+                rotate = Input.GetAxis("Oculus_GearVR_RThumbstickX") * SpeedRotation; // 회전
                 if (Input.GetButtonDown("Jump"))
                 {
                     Run = true;
@@ -129,22 +138,22 @@ public class Murderer : MonoBehaviour, IListener
                     Run = false;
                 }
 
-                Vector3 desiredMove = transform.forward * Vertical + transform.right * Horizontal;
+                Vector3 desiredMove = transform.forward * vertical + transform.right * horizontal;
 
-                MoveDirection.x = desiredMove.x * Speed;
-                MoveDirection.y -= MoveDirectionInit;
-                MoveDirection.z = desiredMove.z * Speed;
+                moveDirection.x = desiredMove.x * Speed;
+                moveDirection.y -= 9.8f;
+                moveDirection.z = desiredMove.z * Speed;
 
-                Controller.Move(MoveDirection * Time.deltaTime);
+                Controller.Move(moveDirection * Time.deltaTime);
 
 
-                transform.Rotate(0, Rotate * Time.deltaTime, 0);
+                transform.Rotate(0, rotate * Time.deltaTime, 0);
             }
 
             else
             {
-                PlayerTr.position = Vector3.Lerp(PlayerTr.position, currPos, Time.deltaTime * 3f);
-                PlayerTr.rotation = Quaternion.Slerp(PlayerTr.rotation, currRot, Time.deltaTime * 3f);
+                playerTr.position = Vector3.Lerp(playerTr.position, currPos, Time.deltaTime * 3f);
+                playerTr.rotation = Quaternion.Slerp(playerTr.rotation, currRot, Time.deltaTime * 3f);
 
             }
         }
@@ -158,15 +167,15 @@ public class Murderer : MonoBehaviour, IListener
     {
         if (stream.isWriting)
         {
-            stream.SendNext(PlayerTr.position);
-            stream.SendNext(PlayerTr.rotation);
-            stream.SendNext((int)Playerstate);
+            stream.SendNext(playerTr.position);
+            stream.SendNext(playerTr.rotation);
+            stream.SendNext((int)playerstate);
         }
         else
         {
             currPos = (Vector3)stream.ReceiveNext();
             currRot = (Quaternion)stream.ReceiveNext();
-            State = (int)stream.ReceiveNext();
+            state = (int)stream.ReceiveNext();
 
         }
     }
@@ -177,22 +186,22 @@ public class Murderer : MonoBehaviour, IListener
     {
         while (true)
         {
-            if (Horizontal == 0 && Vertical == 0 && Rotate == 0)
+            if (horizontal == 0 && vertical == 0 && rotate == 0)
             {
-                Playerstate = PlayerState.Idle;
+                playerstate = PlayerState.Idle;
             }
-            else if (Horizontal != 0 || Vertical != 0 || Rotate != 0)
+            else if (horizontal != 0 || vertical != 0 || rotate != 0)
             {
-                Playerstate = Run ? Playerstate = PlayerState.Run : PlayerState.Walk;
+                playerstate = Run ? playerstate = PlayerState.Run : PlayerState.Walk;
             }
 
             if (Input.GetButton("Fire1"))
             {
-                Playerstate = PlayerState.Attack;
+                playerstate = PlayerState.Attack;
             }
-            if (Die)
+            if (die)
             {
-                Playerstate = PlayerState.Die;
+                playerstate = PlayerState.die;
             }
 
             yield return null;
@@ -206,33 +215,33 @@ public class Murderer : MonoBehaviour, IListener
     {
         while (true)
         {
-            switch (Playerstate)
+            switch (playerstate)
             {
                 case PlayerState.Idle:
                     attack.PlayWeaponIdleAudio();
                     AnimationExcute("Idle");
                     break;
                 case PlayerState.Walk:
-                    Speed = WalkSpeed;
+                    Speed = walkSpeed;
                     attack.PlayWeaponIdleAudio();
                     AnimationExcute("Walk");
                     break;
                 case PlayerState.Run:
-                    Speed = RunSpeed;
+                    Speed = runSpeed;
                     attack.PlayWeaponIdleAudio();
                     AnimationExcute("Run");
                     break;
                 case PlayerState.Attack:
                     Attack = true;
                     AnimationExcute("Attack");
-                    if (!Animator.GetCurrentAnimatorStateInfo(0).IsName("Attack(1)"))
+                    if (!ani.GetCurrentAnimatorStateInfo(0).IsName("Attack(1)"))
                     {                        
                         attack.attack_audio.PlayAudio(AudioController.AudioType.CHAINSSAW_ATTACK, true);
                         murder_Audio.PlayAudio(AudioController.AudioType.MURDER_ATTACK, true);
                     }
                     break;
-                case PlayerState.Die:
-                    AnimationExcute("Die");
+                case PlayerState.die:
+                    AnimationExcute("die");
                     murder_Audio.PlayAudio(AudioController.AudioType.MURDER_DEATH, true);
                     break;
             }
@@ -248,19 +257,19 @@ public class Murderer : MonoBehaviour, IListener
 
         while (true)
         {
-            switch (State)
+            switch (state)
             {
                 case (int)PlayerState.Idle:
                     attack.PlayWeaponIdleAudio();
                     AnimationExcute("Idle");
                     break;
                 case (int)PlayerState.Walk:
-                    Speed = WalkSpeed;
+                    Speed = walkSpeed;
                     attack.PlayWeaponIdleAudio();
                     AnimationExcute("Walk");
                     break;
                 case (int)PlayerState.Run:
-                    Speed = RunSpeed;
+                    Speed = runSpeed;
                     attack.PlayWeaponIdleAudio();
                     AnimationExcute("Run");
                     break;
@@ -268,15 +277,15 @@ public class Murderer : MonoBehaviour, IListener
                     Attack = true;
                     AnimationExcute("Attack");
 
-                    if (!Animator.GetCurrentAnimatorStateInfo(0).IsName("Attack(1)"))
+                    if (!ani.GetCurrentAnimatorStateInfo(0).IsName("Attack(1)"))
                     {
                         attack.attack_audio.PlayAudio(AudioController.AudioType.CHAINSSAW_ATTACK);
                         murder_Audio.PlayAudio(AudioController.AudioType.MURDER_ATTACK, true);
                     }
                     break;
-                case (int)PlayerState.Die:
+                case (int)PlayerState.die:
 
-                    AnimationExcute("Die");                    
+                    AnimationExcute("die");                    
                     murder_Audio.PlayAudio(AudioController.AudioType.MURDER_DEATH, true);
                     
                     break;
@@ -292,7 +301,7 @@ public class Murderer : MonoBehaviour, IListener
         Attack = false;
     }
 
-    public bool getAttacked()
+    public bool IsAttacked()
     {
         return Attack;
     }
@@ -306,23 +315,23 @@ public class Murderer : MonoBehaviour, IListener
     {
         if (flag)
         {
-            SurSkin1.enabled = true;
-            SurSkin2.enabled = true;
-            SurEyesR.enabled = true;
-            SurEyesL.enabled = true;
-            SurMouseLTeeth.enabled = true;
-            SurMouseTongue.enabled = true;
-            SurMouseUTeeth.enabled = true;
+            surSkin1.enabled = true;
+            surSkin2.enabled = true;
+            surEyesR.enabled = true;
+            surEyesL.enabled = true;
+            surMouseLTeeth.enabled = true;
+            surMouseTongue.enabled = true;
+            surMouseUTeeth.enabled = true;
         }
         else
         {
-            SurSkin1.enabled = false;
-            SurSkin2.enabled = false;
-            SurEyesR.enabled = false;
-            SurEyesL.enabled = false;
-            SurMouseLTeeth.enabled = false;
-            SurMouseTongue.enabled = false;
-            SurMouseUTeeth.enabled = false;
+            surSkin1.enabled = false;
+            surSkin2.enabled = false;
+            surEyesR.enabled = false;
+            surEyesL.enabled = false;
+            surMouseLTeeth.enabled = false;
+            surMouseTongue.enabled = false;
+            surMouseUTeeth.enabled = false;
         }
         Camera.GetComponent<SeeThroughSystem>().checkRenderTypes = flag;
 
@@ -371,17 +380,17 @@ public class Murderer : MonoBehaviour, IListener
                 OnTimerEnd();
                 break;
             case EVENT_TYPE.COUNT_DOWN:
-                OnCountDown();
+                OncountDown();
                 break;
             case EVENT_TYPE.TIME_START:
                 gameStart = true;
                 if (Pv.isMine)
                 {
-                    SurEyesR.enabled = false;
-                    SurEyesL.enabled = false;
-                    SurMouseLTeeth.enabled = false;
-                    SurMouseTongue.enabled = false;
-                    SurMouseUTeeth.enabled = false;
+                    surEyesR.enabled = false;
+                    surEyesL.enabled = false;
+                    surMouseLTeeth.enabled = false;
+                    surMouseTongue.enabled = false;
+                    surMouseUTeeth.enabled = false;
                 }
                 break;
             case EVENT_TYPE.SURVIVOR_DIE:
@@ -395,14 +404,14 @@ public class Murderer : MonoBehaviour, IListener
 
                 if (Pv.isMine)
                 {
-                    SurSkin1 = GameObject.FindGameObjectWithTag("SURVIVOR").transform.FindChild("Survival_Chaaracter_02_Body").GetComponentInChildren<SkinnedMeshRenderer>();
+                    surSkin1 = GameObject.FindGameObjectWithTag("SURVIVOR").transform.FindChild("Survival_Chaaracter_02_Body").GetComponentInChildren<SkinnedMeshRenderer>();
 
-                    SurSkin2 = GameObject.FindGameObjectWithTag("SURVIVOR").transform.FindChild("Survival_Chaaracter_02_Head").GetComponentInChildren<SkinnedMeshRenderer>();
-                    SurEyesR = GameObject.Find("Survival_Chaaracter_02_Eyes_R").GetComponent<MeshRenderer>();
-                    SurEyesL = GameObject.Find("Survival_Chaaracter_02_Eyes_L").GetComponent<MeshRenderer>();
-                    SurMouseLTeeth = GameObject.Find("Survival_Character_02_Lower_Teeth").GetComponent<MeshRenderer>();
-                    SurMouseTongue = GameObject.Find("Survival_Character_02_Tongue").GetComponent<MeshRenderer>();
-                    SurMouseUTeeth = GameObject.Find("Survival_Character_Upper_Teeth").GetComponent<MeshRenderer>();
+                    surSkin2 = GameObject.FindGameObjectWithTag("SURVIVOR").transform.FindChild("Survival_Chaaracter_02_Head").GetComponentInChildren<SkinnedMeshRenderer>();
+                    surEyesR = GameObject.Find("Survival_Chaaracter_02_Eyes_R").GetComponent<MeshRenderer>();
+                    surEyesL = GameObject.Find("Survival_Chaaracter_02_Eyes_L").GetComponent<MeshRenderer>();
+                    surMouseLTeeth = GameObject.Find("Survival_Character_02_Lower_Teeth").GetComponent<MeshRenderer>();
+                    surMouseTongue = GameObject.Find("Survival_Character_02_Tongue").GetComponent<MeshRenderer>();
+                    surMouseUTeeth = GameObject.Find("Survival_Character_Upper_Teeth").GetComponent<MeshRenderer>();
 
                     //Survival_Chaaracter_02_Eyes_R
                     //Survival_Character_Upper_Teeth
@@ -414,23 +423,23 @@ public class Murderer : MonoBehaviour, IListener
     public void SurvivorWin()
     {
         gameStart = false;
-        //transform.FindChild("Canvas").transform.FindChild("Panel").transform.FindChild("GameOver").GetComponentInChildren<Animator>().SetTrigger("WIN");
+        //transform.FindChild("Canvas").transform.FindChild("Panel").transform.FindChild("gameOver").GetComponentInChildren<Animator>().SetTrigger("WIN");
         if (Pv.isMine)
-            GameOver.GetComponentInChildren<Animator>().SetTrigger("LOSE");
+            gameOver.GetComponentInChildren<Animator>().SetTrigger("LOSE");
     }
 
     public void SurvivorDead()
     {
         gameStart = false;
-        // transform.FindChild("Canvas").transform.FindChild("Panel").transform.FindChild("GameOver").GetComponentInChildren<Animator>().SetTrigger("WIN");
-        GameOver.GetComponentInChildren<Animator>().SetTrigger("WIN");
+        // transform.FindChild("Canvas").transform.FindChild("Panel").transform.FindChild("gameOver").GetComponentInChildren<Animator>().SetTrigger("WIN");
+        gameOver.GetComponentInChildren<Animator>().SetTrigger("WIN");
     }
 
     public void OnTimerEnd()
     {
         gameStart = false;
-        //  transform.FindChild("Canvas").transform.FindChild("Panel").transform.FindChild("GameOver").GetComponentInChildren<Animator>().SetTrigger("WIN");
-        GameOver.GetComponentInChildren<Animator>().SetTrigger("WIN");
+        //  transform.FindChild("Canvas").transform.FindChild("Panel").transform.FindChild("gameOver").GetComponentInChildren<Animator>().SetTrigger("WIN");
+        gameOver.GetComponentInChildren<Animator>().SetTrigger("WIN");
     }
 
     public void OnCountEnd()
@@ -438,37 +447,37 @@ public class Murderer : MonoBehaviour, IListener
         EventManager.Instance.PostNotification(EVENT_TYPE.TIME_START, this);
     }
 
-    public void OnCountDown()
+    public void OncountDown()
     {
-        //  transform.FindChild("Canvas").transform.FindChild("Panel").transform.FindChild("CountDown").GetComponentInChildren<Animator>().SetTrigger("COUNTDOWN");
-        CountDown.GetComponentInChildren<Animator>().SetTrigger("COUNTDOWN");
-        etcAudio.PlayAudio("COUNTDOWN");
+        //  transform.FindChild("Canvas").transform.FindChild("Panel").transform.FindChild("countDown").GetComponentInChildren<Animator>().SetTrigger("countDown");
+        countDown.GetComponentInChildren<Animator>().SetTrigger("countDown");
+        etcAudio.PlayAudio("countDown");
     }
 
     public void AnimationExcute(string name)
     {
 
-        Animator.SetBool("Idle", false);
-        Animator.SetBool("Walk", false);
-        Animator.SetBool("Run", false);
-        Animator.SetBool("Attack", false);
-        Animator.SetBool("Die", false);
-        Animator.SetBool(name, true);
+        ani.SetBool("Idle", false);
+        ani.SetBool("Walk", false);
+        ani.SetBool("Run", false);
+        ani.SetBool("Attack", false);
+        ani.SetBool("die", false);
+        ani.SetBool(name, true);
     }
 
     private void PlayMudererAudio()
     {
-        if (murder_Audio.GetCheck())
+        if (murder_Audio.isAudioPlay())
         {
-            if (Animator.GetCurrentAnimatorStateInfo(0).IsName("Walk"))
+            if (ani.GetCurrentAnimatorStateInfo(0).IsName("Walk"))
             {
                 murder_Audio.PlayAudio(AudioController.AudioType.MURDER_WALK);
             }
-            else if (Animator.GetCurrentAnimatorStateInfo(0).IsName("Run"))
+            else if (ani.GetCurrentAnimatorStateInfo(0).IsName("Run"))
             {
                 murder_Audio.PlayAudio(AudioController.AudioType.MURDER_RUN);
             }
-            else if (Animator.GetCurrentAnimatorStateInfo(0).IsName("Idle"))
+            else if (ani.GetCurrentAnimatorStateInfo(0).IsName("Idle"))
             {
                 murder_Audio.PlayAudio(AudioController.AudioType.NOT);
             }

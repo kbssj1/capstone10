@@ -32,7 +32,7 @@ public class Attack_AI : MonoBehaviour {
 
     public void PlayNormalAudio()
     {
-        if (attack_audio.GetCheck())
+        if (attack_audio.isAudioPlay())
             attack_audio.PlayAudio(AudioController.AudioType.CHAINSSAW_IDLE);
     }
 

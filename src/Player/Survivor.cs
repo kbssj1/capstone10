@@ -7,36 +7,51 @@ public class Survivor : MonoBehaviour, IListener {
 
     public enum PlayerState { Idle = 0, Walk = 1, Run = 2, Crouch = 3, CrouchWalk = 4, Hit = 5, Die = 6, Gram = 7, Radio=8, Key=9 };
 
-    private const int HeroInitHP = 100;
-    private const float GaugeAdd = 19f;
-    private const float SurvivorInitSpeed = 1.5f;
-    private const float HitBreakTime = 0.7f;
-    private const float SpeedRotationInit = 50;
+    private const int heroInitHP = 100;
+    private const float gaugeAdd = 19f;
+    private const float survivorInitSpeed = 1.5f;
+    private const float hitBreakTime = 0.7f;
+    private const float speedRotationInit = 50;
 
     [Header("Canvas Settings")]
-    public Transform CountDown;
-    public Transform GameOver;
-    public Transform JoyRightBtn;
-    public Transform JoyLeftBtn;
-    public Transform GramGuage;
-    public Image Life;
-    public Image Guage;
+    [SerializeField]
+    private Transform CountDown;
+    [SerializeField]
+    private Transform GameOver;
+    [SerializeField]
+    private Transform JoyRightBtn;
+    [SerializeField]
+    private Transform JoyLeftBtn;
+    [SerializeField]
+    private Transform GramGuage;
+    [SerializeField]
+    private Image Life;
+    [SerializeField]
+    private Image Guage;
     
 
     [Header("Animation Settings")]
-    public Animator Animator;
     [SerializeField]
-    public PlayerState Playerstate;
+    private Animator Animator;
+    [SerializeField]
+    private PlayerState Playerstate;
+    [SerializeField]
     private int State;
-    public GameObject[] Head;
+    [SerializeField]
+    private GameObject[] Head;
 
     [Header("Controller Settings")]
-    public CharacterController Controller;
-    public Transform PlayerTr;
-    public float SpeedRotation = SpeedRotationInit;
-    public float WalkSpeed;
-    public float RunSpeed;
-    private float SurivivorSpeed = SurvivorInitSpeed;
+    [SerializeField]
+    private CharacterController Controller;
+    [SerializeField]
+    private Transform PlayerTr;
+    [SerializeField]
+    private float SpeedRotation = speedRotationInit;
+    [SerializeField]
+    private float WalkSpeed;
+    [SerializeField]
+    private float RunSpeed;
+    private float SurivivorSpeed = survivorInitSpeed;
 
     private Vector3 MoveDirection = Vector3.zero;
     private float Horizontal = 0f;
@@ -56,8 +71,9 @@ public class Survivor : MonoBehaviour, IListener {
     private bool gameStart;
 
     [Header("Photon Settings")]
-    public GameObject Camera;
-    public PhotonView Pv;
+    [SerializeField]
+    private GameObject Camera;
+    private PhotonView pv;
     private Vector3 currPos = Vector3.zero;
     private Quaternion currRot = Quaternion.identity;
 
@@ -80,13 +96,13 @@ public class Survivor : MonoBehaviour, IListener {
         Radio = false;
         Key = false;
 
-        Hp = HeroInitHP;
+        Hp = heroInitHP;
 
         Playerstate = PlayerState.Idle;
         State = 0;
-        Pv.synchronization = ViewSynchronization.UnreliableOnChange;
+        pv.synchronization = ViewSynchronization.UnreliableOnChange;
 
-        Pv.ObservedComponents[0] = this;
+        pv.ObservedComponents[0] = this;
 
         currPos = PlayerTr.position;
         currRot = PlayerTr.rotation;
@@ -109,7 +125,7 @@ public class Survivor : MonoBehaviour, IListener {
         EventManager.Instance.AddListener(EVENT_TYPE.SURVIVOR_WIN, this);
 
 
-        if (Pv.isMine)
+        if (pv.isMine)
         {
             Head[0].GetComponent<SkinnedMeshRenderer>().enabled = false;
             Head[1].SetActive(false);
@@ -127,11 +143,11 @@ public class Survivor : MonoBehaviour, IListener {
 
     void Update()
     {
-        Guage.fillAmount = (sw.ElapsedMilliseconds / 1000) / GaugeAdd;
+        Guage.fillAmount = (sw.ElapsedMilliseconds / 1000) / gaugeAdd;
         
         if (!Die && Playerstate == PlayerState.Idle && !Gram && gameStart && !Radio && !Key)
         {
-            if (Pv.isMine)
+            if (pv.isMine)
             {
                 Horizontal = Input.GetAxis("Horizontal");
                 Vertical = Input.GetAxis("Vertical");
@@ -163,7 +179,7 @@ public class Survivor : MonoBehaviour, IListener {
         }
 
         #region Audio
-        if (survivor_audio.GetCheck())
+        if (survivor_audio.isAudioPlay())
             if (Animator.GetCurrentAnimatorStateInfo(0).IsName("Basic_Walk_01"))
             {
                 survivor_audio.PlayAudio("WALK");
@@ -357,6 +373,11 @@ public class Survivor : MonoBehaviour, IListener {
         Key = flag;
     }
 
+    public Animator GetAni()
+    {
+        return Animator;
+    }
+
     #region
     IEnumerator RemotePlayerAction()
     {
@@ -441,12 +462,12 @@ public class Survivor : MonoBehaviour, IListener {
 
             case EVENT_TYPE.SURVIVOR_HIT:
 
-                if (Pv.isMine && Playerstate == PlayerState.Idle)
+                if (pv.isMine && Playerstate == PlayerState.Idle)
                 {
                     if (Playerstate != PlayerState.Die)
                     {
                         StartCoroutine("Hit", Param);
-                        Pv.RPC("Hit", PhotonTargets.Others, Param);
+                        pv.RPC("Hit", PhotonTargets.Others, Param);
                     }
                 }
 
@@ -454,74 +475,73 @@ public class Survivor : MonoBehaviour, IListener {
 
             case EVENT_TYPE.SURVIVOR_GRAMCTRL:
 
-                if (Pv.isMine)
+                if (pv.isMine)
                 {
                     GramCtrl();
-                    Pv.RPC("GramCtrl", PhotonTargets.Others, null);
+                    pv.RPC("GramCtrl", PhotonTargets.Others, null);
                 }
 
                 break;
             case EVENT_TYPE.SURVIVOR_GRAM_SUC:
 
-                if (Pv.isMine)
+                if (pv.isMine)
                 {
                     GramSuccess();
-                    Pv.RPC("GramSuccess", PhotonTargets.Others, null);
+                    pv.RPC("GramSuccess", PhotonTargets.Others, null);
                 }
                 break;
 
             case EVENT_TYPE.SURVIVOR_RADIOCTRL:
 
-                if (Pv.isMine)
+                if (pv.isMine)
                 {
                     RadioCtrl(Param);
-                    Pv.RPC("RadioCtrl", PhotonTargets.Others, Param);
+                    pv.RPC("RadioCtrl", PhotonTargets.Others, Param);
                 }
                 break;
 
             case EVENT_TYPE.SURVIVOR_RADIO_SUC:
 
-                if (Pv.isMine)
-                {
-                    
+                if (pv.isMine)
+                {                    
                     RadioSuccess();
-                    Pv.RPC("RadioSuccess", PhotonTargets.Others, null);
+                    pv.RPC("RadioSuccess", PhotonTargets.Others, null);
                 }
 
                 break;
             case EVENT_TYPE.SURVIVOR_KEYCTRL:
 
-                if (Pv.isMine)
+                if (pv.isMine)
                 {
                     KeyCtrl();
-                    Pv.RPC("KeyCtrl", PhotonTargets.Others, null);
+                    pv.RPC("KeyCtrl", PhotonTargets.Others, null);
                 }
 
                 break;
             case EVENT_TYPE.SURVIVOR_KEYCTRL2:
 
-                if (Pv.isMine)
+                if (pv.isMine)
                 {
                     KeyCtrl2();
-                    Pv.RPC("KeyCtrl2", PhotonTargets.Others, null);
+                    pv.RPC("KeyCtrl2", PhotonTargets.Others, null);
                 }
 
                 break;
             case EVENT_TYPE.KEY_GET:
 
-                if (Pv.isMine)
+                if (pv.isMine)
                 {
                     KeyGetItem();
-                    Pv.RPC("KeyGetItem", PhotonTargets.Others, null);
+                    pv.RPC("KeyGetItem", PhotonTargets.Others, null);
                 }
 
                 break;
             case EVENT_TYPE.KEY_GET2:
 
-                if (Pv.isMine)
+                if (pv.isMine)
                 {
                     KeyGetItem2();
-                    Pv.RPC("KeyGetItem2", PhotonTargets.Others, null);
+                    pv.RPC("KeyGetItem2", PhotonTargets.Others, null);
                 }
                 
                 break;
@@ -692,7 +712,7 @@ public class Survivor : MonoBehaviour, IListener {
         Life.fillAmount = Life.fillAmount - 0.25f;
 
         StateHit();
-        yield return new WaitForSeconds(HitBreakTime);
+        yield return new WaitForSeconds(hitBreakTime);
 
         if (Hp <= 0)
         {
@@ -731,7 +751,7 @@ public class Survivor : MonoBehaviour, IListener {
     public void SurvivorWin()
     {
         gameStart = false;
-        if(Pv.isMine)
+        if(pv.isMine)
             GameOver.GetComponentInChildren<Animator>().SetTrigger("WIN");
     }
     public void OnTimerEnd()
@@ -756,6 +776,11 @@ public class Survivor : MonoBehaviour, IListener {
     public void OnKeyEnd()
     {
         KeyCtrl();
+    }
+
+    public PhotonView GetPhotonView()
+    {
+        return pv;
     }
 
     public void OnBtnRight_B(bool flag)

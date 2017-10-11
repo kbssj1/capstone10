@@ -12,7 +12,7 @@ public class Attack : MonoBehaviour {
     {
         if (col.CompareTag("SURVIVOR") && tmp)
         {
-            if (murderer.getAttacked())
+            if (murderer.IsAttacked())
             {
                 StartCoroutine(Block2Attack());
                 EventManager.Instance.PostNotification(EVENT_TYPE.SURVIVOR_HIT, this, murderer.getDamage());
@@ -23,14 +23,14 @@ public class Attack : MonoBehaviour {
 
     void Start()
     {
-        attack_audio.PlayAudio("START",true);
+        attack_audio.PlayAudio(AudioController.AudioType.CHAINSSAW_ATTACK,true);
     }
 
 
     public void PlayWeaponIdleAudio()
     {
-        if (attack_audio.GetCheck())
-            attack_audio.PlayAudio("NORMAL");
+        if (attack_audio.isAudioPlay())
+            attack_audio.PlayAudio(AudioController.AudioType.CHAINSSAW_IDLE);
     }
 
     protected IEnumerator Block2Attack()
