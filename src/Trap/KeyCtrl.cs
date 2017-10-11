@@ -30,9 +30,8 @@ public class KeyCtrl : MonoBehaviour, IListener {
         while (true) {
             
             Vector3 viewPos = Camera.main.WorldToViewportPoint(Object.GetComponent<Transform>().position); // 카메라 뷰포트로 변환
-                                                                                                         
-            
-            if(possible && viewPos.x >0.1f && viewPos.x < 0.9f && viewPos.y > 0.1f && viewPos.y < 0.9f && Input.GetButtonDown("Fire2") && survivor.getItemKey())
+                                                                                                                 
+            if(IsAbleKeyOpen(viewPos))
             {
                 KeyOpen();               
             }
@@ -41,7 +40,10 @@ public class KeyCtrl : MonoBehaviour, IListener {
         }
         
     }
-
+    bool IsAbleKeyOpen(Vector3 viewPos)
+    {
+        return possible && viewPos.x > 0.1f && viewPos.x < 0.9f && viewPos.y > 0.1f && viewPos.y < 0.9f && Input.GetButtonDown("Fire2") && survivor.getItemKey();
+    }
 
     void OnTriggerEnter(Collider col)
     {
@@ -89,7 +91,7 @@ public class KeyCtrl : MonoBehaviour, IListener {
 
                 survivor = GameObject.FindGameObjectWithTag("SURVIVOR").GetComponent<Survivor>();
 
-                if(survivor.Pv.isMine)
+                if(survivor.GetPhotonView().isMine)
                 {
                     StartCoroutine(CheckKeyCtrl()); //코루틴 실행
 

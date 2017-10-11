@@ -29,7 +29,6 @@ public class GramCtrl : MonoBehaviour, IListener
         StartCoroutine(TimeCheck());
     }
 
- 
     IEnumerator CheckGramCtrl() // 
     {
         yield return null;
@@ -38,9 +37,8 @@ public class GramCtrl : MonoBehaviour, IListener
         {
 
             Vector3 viewPos = Camera.main.WorldToViewportPoint(Object.GetComponent<Transform>().position); // 카메라 뷰포트로 변환
-
-         
-            if (possible && viewPos.x > 0.1f && viewPos.x < 0.9f && viewPos.y > 0.1f && viewPos.y < 0.9f && Input.GetButtonDown("Fire2") && survivor != null)
+      
+            if (IsAbleGramControl(viewPos))
             {              
                     if (survivor.getGramCtrl())
                     {
@@ -58,6 +56,12 @@ public class GramCtrl : MonoBehaviour, IListener
         }
 
     }
+
+    private bool IsAbleGramControl(Vector3 viewPos)
+    {
+        return possible && viewPos.x > 0.1f && viewPos.x < 0.9f && viewPos.y > 0.1f && viewPos.y < 0.9f && Input.GetButtonDown("Fire2") && survivor != null;
+    }
+
     public IEnumerator TimeCheck()
     {
 
@@ -91,7 +95,6 @@ public class GramCtrl : MonoBehaviour, IListener
         slide.GetComponent<Animator>().SetBool("Slide", true);
         EventManager.Instance.PostNotification(EVENT_TYPE.GRAM_OPEN_KEY, this);
     }
-
 
     void OnTriggerEnter(Collider col)
     {
@@ -132,7 +135,7 @@ public class GramCtrl : MonoBehaviour, IListener
             case EVENT_TYPE.SURVIVOR_CREATE:
 
                 survivor = GameObject.FindGameObjectWithTag("SURVIVOR").GetComponent<Survivor>();
-                if (survivor.Pv.isMine)
+                if (survivor.GetPhotonView().isMine)
                 {
                     StartCoroutine(CheckGramCtrl()); //코루틴 실행
 

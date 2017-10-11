@@ -5,9 +5,10 @@ using UnityEngine;
 public class KeyTrap2 : MonoBehaviour {
 
     private Vector3 endPosition = new Vector3(-19.12572f, -17.59569f, -6.897145f);
-    public Transform _target;
-
-    public float speed = 1.0f;
+    [SerializeField]
+    private Transform _target;
+    [SerializeField]
+    private float speed = 1.0f;
     private float startTime;
     private float journeyLength;
 

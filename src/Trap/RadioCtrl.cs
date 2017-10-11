@@ -6,11 +6,16 @@ public class RadioCtrl : MonoBehaviour, IListener
 {
     private Survivor survivor;
     private bool possible;
-    public GameObject Object;
-    public OutlineSystem outLine;
-    public int cnt = 0;
-    public GameObject door;
-    public GameObject slide;
+    [SerializeField]
+    private GameObject Object;
+    [SerializeField]
+    private OutlineSystem outLine;
+    [SerializeField]
+    private int cnt = 0;
+    [SerializeField]
+    private GameObject door;
+    [SerializeField]
+    private GameObject slide;
 
     // Use this for initialization
     void Start()
@@ -21,7 +26,14 @@ public class RadioCtrl : MonoBehaviour, IListener
         possible = false;
 
     }
- 
+    public int Getcnt()
+    {
+        return cnt;
+    }
+    public void Pluscnt()
+    {
+        ++cnt;
+    }
     IEnumerator CheckRadioCtrl() // 
     {
         yield return null;
@@ -93,7 +105,7 @@ public class RadioCtrl : MonoBehaviour, IListener
             case EVENT_TYPE.SURVIVOR_CREATE:
 
                 survivor = GameObject.FindGameObjectWithTag("SURVIVOR").GetComponent<Survivor>();
-                if (survivor.Pv.isMine)
+                if (survivor.GetPhotonView().isMine)
                 {
                     StartCoroutine(CheckRadioCtrl()); //코루틴 실행
 

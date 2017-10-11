@@ -5,9 +5,10 @@ using UnityEngine;
 public class RadioTrap : MonoBehaviour {
 
     private Vector3 endPosition = new Vector3(-6.84f, -17.6f, -8.261f);
-    public Transform _target;
-
-    public float speed = 1.0f;
+    [SerializeField]
+    private Transform _target;
+    [SerializeField]
+    private float speed = 1.0f;
     private float startTime;
     private float journeyLength;
 

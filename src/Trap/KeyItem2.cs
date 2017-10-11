@@ -29,7 +29,7 @@ public class KeyItem2 : MonoBehaviour, IListener {
             
             Vector3 viewPos = Camera.main.WorldToViewportPoint(Object.GetComponent<Transform>().position); // 카메라 뷰포트로 변환
 
-            if (possible && viewPos.x > 0.1f && viewPos.x < 0.9f && viewPos.y > 0.1f && viewPos.y < 0.9f && Input.GetButtonDown("Fire2"))
+            if (IsAbleGetKey(viewPos))
             {
                 EventManager.Instance.PostNotification(EVENT_TYPE.KEY_GET2, this);                               
             }
@@ -37,6 +37,11 @@ public class KeyItem2 : MonoBehaviour, IListener {
             yield return null;
         }
 
+    }
+
+    bool IsAbleGetKey(Vector3 viewPos)
+    {
+        return possible && viewPos.x > 0.1f && viewPos.x < 0.9f && viewPos.y > 0.1f && viewPos.y < 0.9f && Input.GetButtonDown("Fire2");
     }
 
     void OnTriggerEnter(Collider col)
@@ -75,7 +80,7 @@ public class KeyItem2 : MonoBehaviour, IListener {
 
             case EVENT_TYPE.GRAM_OPEN_KEY:
 
-                if (survivor.Pv.isMine)
+                if (survivor.GetPhotonView().isMine)
                 {
                     open = true;
                     StartCoroutine(CheckKeyItem()); //코루틴 실행
