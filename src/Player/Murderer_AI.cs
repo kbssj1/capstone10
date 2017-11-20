@@ -4,8 +4,8 @@ using UnityEngine.AI;
 
 public class Murderer_AI : MonoBehaviour, IListener {
 	
-	private bool attacking;
-    private bool Attack22;
+	public bool attacking;
+    private bool attack;
     private int damage;
 	[SerializeField]
 	Transform[] PatrolPosition;
@@ -15,13 +15,15 @@ public class Murderer_AI : MonoBehaviour, IListener {
 	public Transform TracePosition;
 	NavMeshAgent NavMeshAgnt;
 	Animator Animat;
-	private string attackType;
+
 
     public Murderer_STATE murder_state;
     // Use this for initialization
 	void Initialize(){
 		attacking = false;
-		attackType = "Attack1";
+
+		attack = false;
+		damage = 25;
 	}
 	void Awake(){
 		Initialize ();
@@ -31,8 +33,8 @@ public class Murderer_AI : MonoBehaviour, IListener {
         EventManager.Instance.AddListener(EVENT_TYPE.TIME_START, this);
         EventManager.Instance.AddListener(EVENT_TYPE.SURVIVOR_DIE, this);
         
-        Attack22 = false;
-        damage = 25;
+
+       
 		NavMeshAgnt = GetComponent<NavMeshAgent> ();
 		Animat = GetComponent<Animator> ();
 	}
@@ -57,17 +59,20 @@ public class Murderer_AI : MonoBehaviour, IListener {
 	}
 	IEnumerator Attack1(){
 		NavMeshAgnt.Stop ();
-		Animat.SetTrigger (attackType);
+
+		Animat.SetTrigger ("Attack1");
 		yield return null;
 	}
 	IEnumerator Attack2(){
 		NavMeshAgnt.Stop ();
-		Animat.SetTrigger (attackType);
+
+		Animat.SetTrigger ("Attack2");
 		yield return null;
 	}
 	IEnumerator Attack3(){
 		NavMeshAgnt.Stop ();
-		Animat.SetTrigger (attackType);
+
+		Animat.SetTrigger ("Attack3");
 		yield return null;
 	}
 	IEnumerator Idle(){
@@ -87,7 +92,7 @@ public class Murderer_AI : MonoBehaviour, IListener {
         
 		if (!attacking) {
             attacking = true;
-            int tmpRandomAttackIndex = (int)Random.Range (1, 4);
+            int tmpRandomAttackIndex = (int)Random.Range (1, 3);
 			this.transform.LookAt (_survivor.position);
 			StartCoroutine ("Attack" + tmpRandomAttackIndex);
 		}
@@ -105,11 +110,11 @@ public class Murderer_AI : MonoBehaviour, IListener {
     }
     public bool getAttacked()
     {
-        return Attack22;
+		return attack;
     }
     public void OnAttackEnd()
 	{
-        Attack22 = false;
+        attack = false;
     }
     public int getDamage()
     {
@@ -136,7 +141,7 @@ public class Murderer_AI : MonoBehaviour, IListener {
     }
     public void OnAttackStart()
     {
-        Attack22 = true;
+        attack = true;
     }
     void OnTimmerEnd()
     {
