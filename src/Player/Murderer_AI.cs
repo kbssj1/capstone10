@@ -10,9 +10,9 @@ public class Murderer_AI : MonoBehaviour, IListener {
 	Animator ani;
 	private bool attacking = false;
     [SerializeField]
-    private Transform currentPatPos;
+    public Transform currentPatPos;
     [SerializeField]
-    private Transform tracePos;
+    public Transform tracePos;
     private bool Attack22;
     private int damage;
 

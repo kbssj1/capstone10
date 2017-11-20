@@ -101,6 +101,5 @@ public class Murderer_STATE : MonoBehaviour {
 	}
 	public void OnShoutEnd(){
 		_state = MurdererAIState.IDLE;
-		_ai.Attacking = false;
 	}
 }

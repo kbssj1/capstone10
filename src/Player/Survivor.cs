@@ -34,7 +34,7 @@ public class Survivor : MonoBehaviour, IListener {
     [SerializeField]
     private Animator Animator;
     [SerializeField]
-    private PlayerState Playerstate;
+	public PlayerState Playerstate;
     [SerializeField]
     private int State;
     [SerializeField]
