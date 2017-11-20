@@ -3,16 +3,16 @@ using System.Collections;
 
 public class Murderer : MonoBehaviour, IListener
 {
-    private const int murderDamage = 25;
-    private const float speedRotationInit = 50;
-    private const float murderSpeedInit = 1.5f;
+	private const int murderDamage = 25;
+	private const float speedRotationInit = 50;
+	private const float murderSpeedInit = 1.5f;
     private enum PlayerState { Idle = 0, Walk = 1, Run = 2, Attack = 3, die = 4 };
 
     [Header("Canvas Settings")]
     [SerializeField]
-    private Transform gameOver;
+    private Transform GameOverUITansfrom;
     [SerializeField]
-    private Transform countDown;
+    private Transform CountDownUITransform;
 
     [Header("Animation Settings")]
     [SerializeField]
@@ -24,13 +24,10 @@ public class Murderer : MonoBehaviour, IListener
     private CharacterController Controller;
     [SerializeField]
     private Transform playerTr;
-    [SerializeField]
+
     private float SpeedRotation = speedRotationInit;
-    [SerializeField]
     private float walkSpeed;
-    [SerializeField]
     private float runSpeed;
-    [SerializeField]
     private float Speed = murderSpeedInit;
 
     private Vector3 moveDirection = Vector3.zero;
@@ -77,26 +74,27 @@ public class Murderer : MonoBehaviour, IListener
     private MeshRenderer surMouseTongue;
 
     // Use this for initialization
+	void Initialize(){
+		die = false;
+		Attack = false;
+		Run = false;
+		Damage = murderDamage;
+		playerstate = PlayerState.Idle;
+		state = 0;
+		Pv.synchronization = ViewSynchronization.UnreliableOnChange;
+
+		Pv.ObservedComponents[0] = this;
+
+		currPos = playerTr.position;
+		currRot = playerTr.rotation;
+
+		gameStart = false;
+
+		etcAudio = GameObject.FindGameObjectWithTag("AUDIO").GetComponent<Etc_Audio>();
+	}
     void Awake()
     {
-
-        die = false;
-        Attack = false;
-        Run = false;
-        Damage = murderDamage;
-        playerstate = PlayerState.Idle;
-        state = 0;
-        Pv.synchronization = ViewSynchronization.UnreliableOnChange;
-
-        Pv.ObservedComponents[0] = this;
-
-        currPos = playerTr.position;
-        currRot = playerTr.rotation;
-
-        gameStart = false;
-
-        etcAudio = GameObject.FindGameObjectWithTag("AUDIO").GetComponent<Etc_Audio>();
-
+		Initialize ();
     }
 
     void Start()
@@ -209,42 +207,51 @@ public class Murderer : MonoBehaviour, IListener
     }
 
     #endregion
+	string PlayerActionFunction(){
+		string animationType = "";
+		switch (playerstate)
+		{
+		case PlayerState.Idle:
+			animationType = "Idle";
+			attack.PlayWeaponIdleAudio();
 
+			break;
+		case PlayerState.Walk:
+			animationType = "Walk";
+			Speed = walkSpeed;
+			attack.PlayWeaponIdleAudio();
+
+			break;
+		case PlayerState.Run:
+			animationType = "Run";
+			Speed = runSpeed;
+			attack.PlayWeaponIdleAudio();
+
+			break;
+		case PlayerState.Attack:
+			animationType = "Attack";
+			Attack = true;
+
+			if (!ani.GetCurrentAnimatorStateInfo(0).IsName("Attack(1)"))
+			{                        
+				attack.attack_audio.PlayAudio(AudioController.AudioType.CHAINSSAW_ATTACK, true);
+				murder_Audio.PlayAudio(AudioController.AudioType.MURDER_ATTACK, true);
+			}
+			break;
+		case PlayerState.die:
+			animationType = "die";
+
+			murder_Audio.PlayAudio(AudioController.AudioType.MURDER_DEATH, true);
+			break;
+		}
+		return animationType;
+	}
     #region
     IEnumerator PlayerAction()
     {
         while (true)
         {
-            switch (playerstate)
-            {
-                case PlayerState.Idle:
-                    attack.PlayWeaponIdleAudio();
-                    AnimationExcute("Idle");
-                    break;
-                case PlayerState.Walk:
-                    Speed = walkSpeed;
-                    attack.PlayWeaponIdleAudio();
-                    AnimationExcute("Walk");
-                    break;
-                case PlayerState.Run:
-                    Speed = runSpeed;
-                    attack.PlayWeaponIdleAudio();
-                    AnimationExcute("Run");
-                    break;
-                case PlayerState.Attack:
-                    Attack = true;
-                    AnimationExcute("Attack");
-                    if (!ani.GetCurrentAnimatorStateInfo(0).IsName("Attack(1)"))
-                    {                        
-                        attack.attack_audio.PlayAudio(AudioController.AudioType.CHAINSSAW_ATTACK, true);
-                        murder_Audio.PlayAudio(AudioController.AudioType.MURDER_ATTACK, true);
-                    }
-                    break;
-                case PlayerState.die:
-                    AnimationExcute("die");
-                    murder_Audio.PlayAudio(AudioController.AudioType.MURDER_DEATH, true);
-                    break;
-            }
+			AnimationExcute(PlayerActionFunction());
             yield return null;
         }
 
@@ -257,40 +264,8 @@ public class Murderer : MonoBehaviour, IListener
 
         while (true)
         {
-            switch (state)
-            {
-                case (int)PlayerState.Idle:
-                    attack.PlayWeaponIdleAudio();
-                    AnimationExcute("Idle");
-                    break;
-                case (int)PlayerState.Walk:
-                    Speed = walkSpeed;
-                    attack.PlayWeaponIdleAudio();
-                    AnimationExcute("Walk");
-                    break;
-                case (int)PlayerState.Run:
-                    Speed = runSpeed;
-                    attack.PlayWeaponIdleAudio();
-                    AnimationExcute("Run");
-                    break;
-                case (int)PlayerState.Attack:
-                    Attack = true;
-                    AnimationExcute("Attack");
-
-                    if (!ani.GetCurrentAnimatorStateInfo(0).IsName("Attack(1)"))
-                    {
-                        attack.attack_audio.PlayAudio(AudioController.AudioType.CHAINSSAW_ATTACK);
-                        murder_Audio.PlayAudio(AudioController.AudioType.MURDER_ATTACK, true);
-                    }
-                    break;
-                case (int)PlayerState.die:
-
-                    AnimationExcute("die");                    
-                    murder_Audio.PlayAudio(AudioController.AudioType.MURDER_DEATH, true);
-                    
-                    break;
-            }
-            yield return null;
+			AnimationExcute(PlayerActionFunction());
+			yield return null;
         }
 
     }
@@ -405,7 +380,6 @@ public class Murderer : MonoBehaviour, IListener
                 if (Pv.isMine)
                 {
                     surSkin1 = GameObject.FindGameObjectWithTag("SURVIVOR").transform.FindChild("Survival_Chaaracter_02_Body").GetComponentInChildren<SkinnedMeshRenderer>();
-
                     surSkin2 = GameObject.FindGameObjectWithTag("SURVIVOR").transform.FindChild("Survival_Chaaracter_02_Head").GetComponentInChildren<SkinnedMeshRenderer>();
                     surEyesR = GameObject.Find("Survival_Chaaracter_02_Eyes_R").GetComponent<MeshRenderer>();
                     surEyesL = GameObject.Find("Survival_Chaaracter_02_Eyes_L").GetComponent<MeshRenderer>();
@@ -425,21 +399,21 @@ public class Murderer : MonoBehaviour, IListener
         gameStart = false;
         //transform.FindChild("Canvas").transform.FindChild("Panel").transform.FindChild("gameOver").GetComponentInChildren<Animator>().SetTrigger("WIN");
         if (Pv.isMine)
-            gameOver.GetComponentInChildren<Animator>().SetTrigger("LOSE");
+			GameOverUITansfrom.GetComponentInChildren<Animator>().SetTrigger("LOSE");
     }
 
     public void SurvivorDead()
     {
         gameStart = false;
         // transform.FindChild("Canvas").transform.FindChild("Panel").transform.FindChild("gameOver").GetComponentInChildren<Animator>().SetTrigger("WIN");
-        gameOver.GetComponentInChildren<Animator>().SetTrigger("WIN");
+		GameOverUITansfrom.GetComponentInChildren<Animator>().SetTrigger("WIN");
     }
 
     public void OnTimerEnd()
     {
         gameStart = false;
         //  transform.FindChild("Canvas").transform.FindChild("Panel").transform.FindChild("gameOver").GetComponentInChildren<Animator>().SetTrigger("WIN");
-        gameOver.GetComponentInChildren<Animator>().SetTrigger("WIN");
+		GameOverUITansfrom.GetComponentInChildren<Animator>().SetTrigger("WIN");
     }
 
     public void OnCountEnd()
@@ -450,7 +424,7 @@ public class Murderer : MonoBehaviour, IListener
     public void OncountDown()
     {
         //  transform.FindChild("Canvas").transform.FindChild("Panel").transform.FindChild("countDown").GetComponentInChildren<Animator>().SetTrigger("countDown");
-        countDown.GetComponentInChildren<Animator>().SetTrigger("countDown");
+		CountDownUITransform.GetComponentInChildren<Animator>().SetTrigger("countDown");
         etcAudio.PlayAudio("countDown");
     }
 

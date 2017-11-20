@@ -11,7 +11,7 @@ public class Survivor : MonoBehaviour, IListener {
     private const float gaugeAdd = 19f;
     private const float survivorInitSpeed = 1.5f;
     private const float hitBreakTime = 0.7f;
-    private const float speedRotationInit = 50;
+    private const float rotationInitSpeed = 50;
 
     [Header("Canvas Settings")]
     [SerializeField]
@@ -46,16 +46,16 @@ public class Survivor : MonoBehaviour, IListener {
     [SerializeField]
     private Transform PlayerTr;
     [SerializeField]
-    private float SpeedRotation = speedRotationInit;
+	private float SpeedRotation ;
     [SerializeField]
     private float WalkSpeed;
     [SerializeField]
     private float RunSpeed;
-    private float SurivivorSpeed = survivorInitSpeed;
+	private float SurivivorSpeed;
 
     private Vector3 MoveDirection = Vector3.zero;
-    private float Horizontal = 0f;
-    private float Vertical = 0f;
+	private float Horizontal;
+	private float Vertical;
     private float Rotate;
 
     [Header("Character Settings")]
@@ -85,29 +85,36 @@ public class Survivor : MonoBehaviour, IListener {
 
     Stopwatch sw;
     // Use this for initialization
+	void Initailize(){
+		Horizontal = 0f;
+		Vertical = 0f;
+		SpeedRotation = rotationInitSpeed;
+		SurivivorSpeed = survivorInitSpeed;
+		ItemKey = false;
+		Die = false;
+		Run = false;
+		Crouch = false;
+		Moving = false;
+		Gram = false;
+		Radio = false;
+		Key = false;
+
+		Hp = heroInitHP;
+
+		Playerstate = PlayerState.Idle;
+		State = 0;
+		pv.synchronization = ViewSynchronization.UnreliableOnChange;
+
+		pv.ObservedComponents[0] = this;
+
+		currPos = PlayerTr.position;
+		currRot = PlayerTr.rotation;
+
+		gameStart = false;
+	}
     void Awake()
     {
-        ItemKey = false;
-        Die = false;
-        Run = false;
-        Crouch = false;
-        Moving = false;
-        Gram = false;
-        Radio = false;
-        Key = false;
-
-        Hp = heroInitHP;
-
-        Playerstate = PlayerState.Idle;
-        State = 0;
-        pv.synchronization = ViewSynchronization.UnreliableOnChange;
-
-        pv.ObservedComponents[0] = this;
-
-        currPos = PlayerTr.position;
-        currRot = PlayerTr.rotation;
-
-        gameStart = false;
+		Initailize ();
         sw = new Stopwatch();
         etcAudio = GameObject.FindGameObjectWithTag("AUDIO").GetComponent<Etc_Audio>();
     }
@@ -179,25 +186,28 @@ public class Survivor : MonoBehaviour, IListener {
         }
 
         #region Audio
-        if (survivor_audio.isAudioPlay())
+		if (survivor_audio.isAudioPlay()){
+			string playAudioType="";
             if (Animator.GetCurrentAnimatorStateInfo(0).IsName("Basic_Walk_01"))
             {
-                survivor_audio.PlayAudio("WALK");
+				playAudioType="WALK";
             }
             else if (Animator.GetCurrentAnimatorStateInfo(0).IsName("Basic_Run_02"))
             {
-                survivor_audio.PlayAudio("RUN");
+				playAudioType="RUN";   
             }
             else if (Animator.GetCurrentAnimatorStateInfo(0).IsName("HumanoidCrouchWalk 0"))
             {
-                survivor_audio.PlayAudio("CROUCH_WALK");
+				playAudioType="CROUCH_WALK";    
             }
             else if (Animator.GetCurrentAnimatorStateInfo(0).IsName("HumanoidIdle"))
             {
-                survivor_audio.PlayAudio("NOT");
+				playAudioType="NOT";  
             }
+			survivor_audio.PlayAudio(playAudioType);
+		}
             #endregion
-            }
+    }
 
     void OnPhotonSerializeView(PhotonStream stream, PhotonMessageInfo info)
     {
@@ -272,43 +282,54 @@ public class Survivor : MonoBehaviour, IListener {
     {
         while (true)
         {
+			string animationType="";
             switch (Playerstate)
             {
-                case PlayerState.Idle:
-                    AnimationExcute("Idle");
+				case PlayerState.Idle:
+					animationType = "Idle";
                     break;
                 case PlayerState.Walk:
+					animationType = "Walk";
                     SurivivorSpeed = WalkSpeed;
-                    AnimationExcute("Walk");
+                   
                     break;
                 case PlayerState.Run:
+				animationType = "Run";
                     SurivivorSpeed = RunSpeed;
-                    AnimationExcute("Run");
+              
                     break;
                 case PlayerState.Crouch:
-                    AnimationExcute("Crouch");
+				animationType = "Crouch";
+                  
                     break;
                 case PlayerState.CrouchWalk:
+				animationType = "CrouchWalk";
                     SurivivorSpeed = WalkSpeed;
-                    AnimationExcute("CrouchWalk");
+                  
                     break;
                 case PlayerState.Hit:
-                    AnimationExcute("Hit");
+				animationType = "Hit";
+                   
                     break;
                 case PlayerState.Die:
-                    AnimationExcute("Die");
+				animationType = "Die";
+                  
                     EventManager.Instance.PostNotification(EVENT_TYPE.SURVIVOR_DIE, this);
                     break;
                 case PlayerState.Gram:
-                    AnimationExcute("Gram");
+				animationType = "Gram";
+                  
                     break;
                 case PlayerState.Radio:
-                    AnimationExcute("Radio");
+				animationType = "Radio";
+                    
                     break;
                 case PlayerState.Key:
-                    AnimationExcute("Key");
+				animationType = "Key";
+                    
                     break;
             }
+			AnimationExcute(animationType);
             yield return null;
         }
 
@@ -383,71 +404,78 @@ public class Survivor : MonoBehaviour, IListener {
     {
         while (true)
         {
+			string animationType = "";
+
             switch (State)
             {
-                case (int)PlayerState.Idle:
+			case (int)PlayerState.Idle:
+					animationType = "Idle";
                     sendMoveEvent(false,"");
-                    AnimationExcute("Idle");
+                   
                     break;
 
                 case (int)PlayerState.Walk:
+				animationType = "Walk";
                     sendMoveEvent(false, "");
                     SurivivorSpeed = WalkSpeed;
-                    AnimationExcute("Walk");
+               
                     break;
 
                 case (int)PlayerState.Run:
+				animationType = "Run";
                     sendMoveEvent(true, "");
                     SurivivorSpeed = RunSpeed;
-                    AnimationExcute("Run");
+                    
                     break;
 
                 case (int)PlayerState.Crouch:
+				animationType = "Crouch";
                     sendMoveEvent(false, "");
-                    AnimationExcute("Crouch");
+                   
                     break;
 
                 case (int)PlayerState.CrouchWalk:
-
+				animationType = "CrouchWalk";
                     sendMoveEvent(false, "");
                     SurivivorSpeed = WalkSpeed;
-                    AnimationExcute("CrouchWalk");
+                 
 
                     break;
 
                 case (int)PlayerState.Hit:
-
+				animationType = "Hit";
                     sendMoveEvent(true, "");
-                    AnimationExcute("Hit");
+                 
 
                     break;
 
                 case (int)PlayerState.Die:
-
+				animationType = "Die";
                     sendMoveEvent(true, "");
-                    AnimationExcute("Die");
+                  
                     EventManager.Instance.PostNotification(EVENT_TYPE.SURVIVOR_DIE, this);
                     break;
 
                 case (int)PlayerState.Gram:
-
+				animationType = "Gram";
                     sendMoveEvent(true, "Gram");
-                    AnimationExcute("Gram");
+                 
 
                     break;
                 case (int)PlayerState.Radio:
-
+				animationType = "Radio";
                     sendMoveEvent(true, "Radio");
-                    AnimationExcute("Radio");
+                
 
                     break;
                 case (int)PlayerState.Key:
-
+				animationType = "Key";
                     sendMoveEvent(true, "");
-                    AnimationExcute("Key");
+                   
 
                     break;
             }
+			AnimationExcute(animationType);
             yield return null;
         }
 

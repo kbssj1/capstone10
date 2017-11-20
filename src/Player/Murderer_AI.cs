@@ -3,25 +3,29 @@ using System.Collections;
 using UnityEngine.AI;
 
 public class Murderer_AI : MonoBehaviour, IListener {
-	[SerializeField]
-	Transform[] patrolPos;
-
-	NavMeshAgent naviAgnt;
-	Animator ani;
-	private bool attacking = false;
-    [SerializeField]
-    public Transform currentPatPos;
-    [SerializeField]
-    public Transform tracePos;
+	
+	private bool attacking;
     private bool Attack22;
     private int damage;
-
-    private string attackType1 = "Attack1";
-    private string attackType2 = "Attack1";
-    private string attackType3 = "Attack1";
+	[SerializeField]
+	Transform[] PatrolPosition;
+	[SerializeField]
+	public Transform CurrentPatrolPosition;
+	[SerializeField]
+	public Transform TracePosition;
+	NavMeshAgent NavMeshAgnt;
+	Animator Animat;
+	private string attackType;
 
     public Murderer_STATE murder_state;
     // Use this for initialization
+	void Initialize(){
+		attacking = false;
+		attackType = "Attack1";
+	}
+	void Awake(){
+		Initialize ();
+	}
     void Start () {
         EventManager.Instance.AddListener(EVENT_TYPE.TIME_OVER, this);
         EventManager.Instance.AddListener(EVENT_TYPE.TIME_START, this);
@@ -29,49 +33,46 @@ public class Murderer_AI : MonoBehaviour, IListener {
         
         Attack22 = false;
         damage = 25;
-        naviAgnt = GetComponent<NavMeshAgent> ();
-        ani = GetComponent<Animator> ();
+		NavMeshAgnt = GetComponent<NavMeshAgent> ();
+		Animat = GetComponent<Animator> ();
 	}
 	IEnumerator Walk(){
 
-        naviAgnt.Stop ();
-        naviAgnt.Resume();
-        ani.SetTrigger ("Walk");
-
-        int index = (int)Random.Range (0, patrolPos.Length);
-		currentPatPos = patrolPos [index];
-        naviAgnt.SetDestination (patrolPos [index].position);
+		NavMeshAgnt.Stop ();
+		NavMeshAgnt.Resume();
+		Animat.SetTrigger ("Walk");
+		int index = (int)Random.Range (0, PatrolPosition.Length);
+		CurrentPatrolPosition = PatrolPosition [index];
+		NavMeshAgnt.SetDestination (PatrolPosition [index].position);
 
         yield return null;
 	}
 	IEnumerator Run(){
-        naviAgnt.Stop ();
-        naviAgnt.Resume();
-        ani.SetTrigger ("Run");
-
-
-        naviAgnt.SetDestination (tracePos.position);
+		NavMeshAgnt.Stop ();
+		NavMeshAgnt.Resume();
+		Animat.SetTrigger ("Run");
+		NavMeshAgnt.SetDestination (TracePosition.position);
 
         yield return null;
 	}
 	IEnumerator Attack1(){
-        naviAgnt.Stop ();
-        ani.SetTrigger (attackType1);
+		NavMeshAgnt.Stop ();
+		Animat.SetTrigger (attackType);
 		yield return null;
 	}
 	IEnumerator Attack2(){
-        naviAgnt.Stop ();
-        ani.SetTrigger (attackType2);
+		NavMeshAgnt.Stop ();
+		Animat.SetTrigger (attackType);
 		yield return null;
 	}
 	IEnumerator Attack3(){
-        naviAgnt.Stop ();
-        ani.SetTrigger (attackType2);
+		NavMeshAgnt.Stop ();
+		Animat.SetTrigger (attackType);
 		yield return null;
 	}
 	IEnumerator Idle(){
-        naviAgnt.Stop ();
-        ani.SetTrigger ("Idle");
+		NavMeshAgnt.Stop ();
+		Animat.SetTrigger ("Idle");
 		yield return null;
 
 	}
@@ -92,7 +93,6 @@ public class Murderer_AI : MonoBehaviour, IListener {
 		}
 	}
 	public void Stop(){
-		
 		StartCoroutine (Idle ());
 	}
 	public void StopAIRoutine(){
@@ -101,15 +101,14 @@ public class Murderer_AI : MonoBehaviour, IListener {
 	}
     public Animator GetAni()
     {
-        return ani;
+		return Animat;
     }
     public bool getAttacked()
     {
         return Attack22;
     }
     public void OnAttackEnd()
-    {
-
+	{
         Attack22 = false;
     }
     public int getDamage()
