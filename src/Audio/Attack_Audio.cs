@@ -5,9 +5,9 @@ using UnityEngine;
 public class Attack_Audio : AudioController
 {
 
-    public AudioClip Audio_Attack_Start;
-    public AudioClip Audio_Attack_Normal;
-    public AudioClip Audio_Attack_Attack;
+    public AudioClip audio_Attack_Start;
+    public AudioClip audio_Attack_Normal;
+    public AudioClip audio_Attack_Attack;
 
     void Start()
     {
@@ -23,7 +23,7 @@ public class Attack_Audio : AudioController
                 switch (audioName)
                 {
                     case "NORMAL":
-                        audioSource.clip = Audio_Attack_Normal;
+                        audioSource.clip = audio_Attack_Normal;
                         break;
                     default:
                         Debug.LogError("잘못된 오디오 명을 입력하셨습니다.(Attack)");
@@ -39,12 +39,12 @@ public class Attack_Audio : AudioController
                 switch (audioName)
                 {
                     case "START":                      
-                        audioSource.clip = Audio_Attack_Start;
+                        audioSource.clip = audio_Attack_Start;
                         if (audioSource.clip != null)
                             StartCoroutine(TestAudio(audioSource.clip.length));
                         break;
                     case "ATTACK":
-                        audioSource.clip = Audio_Attack_Attack;
+                        audioSource.clip = audio_Attack_Attack;
                         if (audioSource.clip != null)
                             StartCoroutine(TestAudio(1.2f));
                         break;
