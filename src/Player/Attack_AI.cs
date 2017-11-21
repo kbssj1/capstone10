@@ -24,10 +24,7 @@ public class Attack_AI : MonoBehaviour {
 
     }
 
-    void Start()
-    {
-        attack_audio.PlayAudio(AudioController.AudioType.CHAINSSAW_START, true);
-    }
+    
 
 
     public void PlayNormalAudio()

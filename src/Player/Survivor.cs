@@ -43,8 +43,8 @@ public class Survivor : MonoBehaviour, IListener {
     [Header("Controller Settings")]
     [SerializeField]
     private CharacterController Controller;
-    [SerializeField]
-    private Transform PlayerTr;
+    
+    public Transform PlayerTr;
     [SerializeField]
 	private float SpeedRotation ;
     [SerializeField]
@@ -69,10 +69,11 @@ public class Survivor : MonoBehaviour, IListener {
     private bool ItemKey;
     private bool Moving;
     private bool gameStart;
-
+	private bool hit;
     [Header("Photon Settings")]
     [SerializeField]
     private GameObject Camera;
+	[SerializeField]
     private PhotonView pv;
     private Vector3 currPos = Vector3.zero;
     private Quaternion currRot = Quaternion.identity;
@@ -86,6 +87,7 @@ public class Survivor : MonoBehaviour, IListener {
     Stopwatch sw;
     // Use this for initialization
 	void Initailize(){
+		pv = GetComponent<PhotonView> ();
 		Horizontal = 0f;
 		Vertical = 0f;
 		SpeedRotation = rotationInitSpeed;
@@ -98,39 +100,36 @@ public class Survivor : MonoBehaviour, IListener {
 		Gram = false;
 		Radio = false;
 		Key = false;
-
+		hit = false;
 		Hp = heroInitHP;
-
+		WalkSpeed = 1.5f;
+		RunSpeed = 3.0f;
 		Playerstate = PlayerState.Idle;
 		State = 0;
-		pv.synchronization = ViewSynchronization.UnreliableOnChange;
-
-		pv.ObservedComponents[0] = this;
-
 		currPos = PlayerTr.position;
 		currRot = PlayerTr.rotation;
-
 		gameStart = false;
+		pv.synchronization = ViewSynchronization.UnreliableOnChange;
+		pv.ObservedComponents[0] = this;
+		etcAudio = GameObject.FindGameObjectWithTag("AUDIO").GetComponent<Etc_Audio>();
 	}
     void Awake()
     {
 		Initailize ();
         sw = new Stopwatch();
-        etcAudio = GameObject.FindGameObjectWithTag("AUDIO").GetComponent<Etc_Audio>();
     }
 
     void Start()
     {
-        for (EVENT_TYPE i = EVENT_TYPE.SURVIVOR_HIT; i < EVENT_TYPE.KEY_GET2; i++)
-        {
-            EventManager.Instance.AddListener(i, this);
-        }
-        EventManager.Instance.AddListener(EVENT_TYPE.COUNT_DOWN, this);     
-        EventManager.Instance.AddListener(EVENT_TYPE.TIME_OVER, this);
-        EventManager.Instance.AddListener(EVENT_TYPE.TIME_START, this);
-        EventManager.Instance.AddListener(EVENT_TYPE.SURVIVOR_DIE, this);
-        EventManager.Instance.AddListener(EVENT_TYPE.SURVIVOR_WIN, this);
-
+		for (EVENT_TYPE i = EVENT_TYPE.SURVIVOR_HIT; i < EVENT_TYPE.KEY_GET2; i++)
+		{
+			EventManager.Instance.AddListener(i, this);
+		}
+		EventManager.Instance.AddListener(EVENT_TYPE.COUNT_DOWN, this);     
+		EventManager.Instance.AddListener(EVENT_TYPE.TIME_OVER, this);
+		EventManager.Instance.AddListener(EVENT_TYPE.TIME_START, this);
+		EventManager.Instance.AddListener(EVENT_TYPE.SURVIVOR_DIE, this);
+		EventManager.Instance.AddListener(EVENT_TYPE.SURVIVOR_WIN, this);
 
         if (pv.isMine)
         {
@@ -152,7 +151,7 @@ public class Survivor : MonoBehaviour, IListener {
     {
         Guage.fillAmount = (sw.ElapsedMilliseconds / 1000) / gaugeAdd;
         
-        if (!Die && Playerstate == PlayerState.Idle && !Gram && gameStart && !Radio && !Key)
+		if (!Die && !hit&& !Gram && gameStart && !Radio && !Key)
         {
             if (pv.isMine)
             {
@@ -204,7 +203,9 @@ public class Survivor : MonoBehaviour, IListener {
             {
 				playAudioType="NOT";  
             }
+			if(playAudioType!=""){
 			survivor_audio.PlayAudio(playAudioType);
+			}
 		}
             #endregion
     }
@@ -232,7 +233,12 @@ public class Survivor : MonoBehaviour, IListener {
         {
             if (Horizontal == 0 && Vertical == 0 && Rotate == 0)
             {
-                Playerstate = Crouch ? PlayerState.Crouch : PlayerState.Idle;
+				if (Crouch) {
+					Playerstate = PlayerState.Crouch;
+				} else {
+					Playerstate=PlayerState.Idle;
+				}
+
             }
             else if (Horizontal != 0 || Vertical != 0 || Rotate != 0)
             {
@@ -252,7 +258,9 @@ public class Survivor : MonoBehaviour, IListener {
                         Playerstate = PlayerState.Idle;
                     else
                     {
-                        Playerstate = Run ? PlayerState.Run : PlayerState.Walk;
+						Playerstate = PlayerState.Walk;
+						if (Run)
+							Playerstate = PlayerState.Run;
                     }
                 }
 
@@ -262,7 +270,7 @@ public class Survivor : MonoBehaviour, IListener {
             {
                 Playerstate = PlayerState.Die;              
             }
-            if (Playerstate != PlayerState.Die && Playerstate == PlayerState.Idle)
+			if (Playerstate != PlayerState.Die && hit)
             {
                 Playerstate = PlayerState.Hit;
             }
@@ -329,7 +337,8 @@ public class Survivor : MonoBehaviour, IListener {
                     
                     break;
             }
-			AnimationExcute(animationType);
+			if(animationType !="")
+				AnimationExcute(animationType);
             yield return null;
         }
 
@@ -475,7 +484,8 @@ public class Survivor : MonoBehaviour, IListener {
 
                     break;
             }
-			AnimationExcute(animationType);
+			if(animationType!="")
+				AnimationExcute(animationType);
             yield return null;
         }
 
@@ -490,7 +500,7 @@ public class Survivor : MonoBehaviour, IListener {
 
             case EVENT_TYPE.SURVIVOR_HIT:
 
-                if (pv.isMine && Playerstate == PlayerState.Idle)
+                if (pv.isMine && !hit)
                 {
                     if (Playerstate != PlayerState.Die)
                     {
@@ -626,7 +636,7 @@ public class Survivor : MonoBehaviour, IListener {
     public void RadioSuccess()
     {
         EventManager.Instance.PostNotification(EVENT_TYPE.RADIO_SUCCESS, this);
-        audioManager.mongue_audio1.PlayAudio();
+		audioManager.mongue_audio1.PlayAudio ();
     }  // 시체 안치실 열릴 때
 
     [PunRPC]
@@ -734,14 +744,15 @@ public class Survivor : MonoBehaviour, IListener {
     [PunRPC]
     public IEnumerator Hit(object Param)
     {
+		Playerstate = PlayerState.Hit;
         survivor_audio.PlayAudio("ATTACKED", true);
         int damage = (int)Param;
         Hp -= damage;
         Life.fillAmount = Life.fillAmount - 0.25f;
-
+		hit = true;
         StateHit();
         yield return new WaitForSeconds(hitBreakTime);
-
+		hit = false;
         if (Hp <= 0)
         {
             survivor_audio.PlayAudio("DEATH", true);
