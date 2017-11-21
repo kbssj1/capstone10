@@ -7,135 +7,130 @@ public class Survivor : MonoBehaviour, IListener {
 
     public enum PlayerState { Idle = 0, Walk = 1, Run = 2, Crouch = 3, CrouchWalk = 4, Hit = 5, Die = 6, Gram = 7, Radio=8, Key=9 };
 
-    private const int heroInitHP = 100;
+    private const int survivorInitHP = 100;
     private const float gaugeAdd = 19f;
     private const float survivorInitSpeed = 1.5f;
     private const float hitBreakTime = 0.7f;
     private const float rotationInitSpeed = 50;
 
     [Header("Canvas Settings")]
-    [SerializeField]
-    private Transform CountDown;
-    [SerializeField]
-    private Transform GameOver;
-    [SerializeField]
-    private Transform JoyRightBtn;
-    [SerializeField]
-    private Transform JoyLeftBtn;
-    [SerializeField]
-    private Transform GramGuage;
-    [SerializeField]
-    private Image Life;
-    [SerializeField]
-    private Image Guage;
-    
+    public Transform countDown;
+    public Transform gameOver;
+    public Transform joyRightBtn;
+    public Transform joyLeftBtn;
+    public Transform gramGuage;
+    public Image life;
+    public Image guage;
+    private float time = gaugeAdd;
 
     [Header("Animation Settings")]
+    public Animator animator;
     [SerializeField]
-    private Animator Animator;
-    [SerializeField]
-	public PlayerState Playerstate;
-    [SerializeField]
-    private int State;
-    [SerializeField]
-    private GameObject[] Head;
+    public PlayerState playerState;
+    private int state;
+    public GameObject[] head;
 
     [Header("Controller Settings")]
-    [SerializeField]
-    private CharacterController Controller;
-    
-    public Transform PlayerTr;
-    [SerializeField]
-	private float SpeedRotation ;
-    [SerializeField]
-    private float WalkSpeed;
-    [SerializeField]
-    private float RunSpeed;
-	private float SurivivorSpeed;
+    public CharacterController characterController;
+    public Transform playerTr;
+    private float speedRotation = rotationInitSpeed;
+    private float walkSpeed = survivorInitSpeed;
+    private float runSpeed = 3.0f;
+    private float speed = 1.5f;
 
-    private Vector3 MoveDirection = Vector3.zero;
-	private float Horizontal;
-	private float Vertical;
-    private float Rotate;
+    private Vector3 moveDirection = Vector3.zero;
+    private float horizontal = 0f;
+    private float vertical = 0f;
+    private float rotate;
 
     [Header("Character Settings")]
-    private bool Die;
-    private bool Run;
-    private bool Crouch;
-    private bool Gram;
-    private bool Radio;
-    private bool Key;
-    private int Hp;
-    private bool ItemKey;
-    private bool Moving;
+    private bool die;
+    private bool run;
+    private bool crouch;
+    private bool hit;
+    private bool gram;
+    private bool radio;
+    private bool key;
+    private int hp;
+    private bool itemKey;
+    private bool moving;
+
+
     private bool gameStart;
-	private bool hit;
+
     [Header("Photon Settings")]
-    [SerializeField]
-    private GameObject Camera;
-	[SerializeField]
-    private PhotonView pv;
+    public GameObject mainCamera;
+    public PhotonView pv;
     private Vector3 currPos = Vector3.zero;
     private Quaternion currRot = Quaternion.identity;
 
+    #region Audio
     [Header("Audio Settings")]
     public Survivor_Audio survivor_audio;
     public Survivor_Audio2 survivor_heart_audio;
+    private int HeartBeat = 0;
     public Etc_Audio etcAudio;
     public AudioManager audioManager;
 
+    float cooltime = 19f;
+    float leftTime = 19f;
+
     Stopwatch sw;
+    #endregion
     // Use this for initialization
-	void Initailize(){
-		pv = GetComponent<PhotonView> ();
-		Horizontal = 0f;
-		Vertical = 0f;
-		SpeedRotation = rotationInitSpeed;
-		SurivivorSpeed = survivorInitSpeed;
-		ItemKey = false;
-		Die = false;
-		Run = false;
-		Crouch = false;
-		Moving = false;
-		Gram = false;
-		Radio = false;
-		Key = false;
-		hit = false;
-		Hp = heroInitHP;
-		WalkSpeed = 1.5f;
-		RunSpeed = 3.0f;
-		Playerstate = PlayerState.Idle;
-		State = 0;
-		currPos = PlayerTr.position;
-		currRot = PlayerTr.rotation;
-		gameStart = false;
-		pv.synchronization = ViewSynchronization.UnreliableOnChange;
-		pv.ObservedComponents[0] = this;
-		etcAudio = GameObject.FindGameObjectWithTag("AUDIO").GetComponent<Etc_Audio>();
-	}
+
+    void Initailize()
+    {
+        itemKey = false;
+        die = false;
+        run = false;
+        crouch = false;
+        hit = false;
+        moving = false;
+        gram = false;
+        radio = false;
+        key = false;
+
+        hp = survivorInitHP;
+
+        playerState = PlayerState.Idle;
+        state = 0;
+        pv.synchronization = ViewSynchronization.UnreliableOnChange;
+
+        pv.ObservedComponents[0] = this;
+
+        currPos = playerTr.position;
+        currRot = playerTr.rotation;
+
+        gameStart = false;
+        sw = new Stopwatch();
+        etcAudio = GameObject.FindGameObjectWithTag("AUDIO").GetComponent<Etc_Audio>();
+    }
+
     void Awake()
     {
-		Initailize ();
-        sw = new Stopwatch();
+        Initailize();
     }
 
     void Start()
     {
-		for (EVENT_TYPE i = EVENT_TYPE.SURVIVOR_HIT; i < EVENT_TYPE.KEY_GET2; i++)
-		{
-			EventManager.Instance.AddListener(i, this);
-		}
-		EventManager.Instance.AddListener(EVENT_TYPE.COUNT_DOWN, this);     
-		EventManager.Instance.AddListener(EVENT_TYPE.TIME_OVER, this);
-		EventManager.Instance.AddListener(EVENT_TYPE.TIME_START, this);
-		EventManager.Instance.AddListener(EVENT_TYPE.SURVIVOR_DIE, this);
-		EventManager.Instance.AddListener(EVENT_TYPE.SURVIVOR_WIN, this);
+        for (EVENT_TYPE i = EVENT_TYPE.SURVIVOR_HIT; i <= EVENT_TYPE.B_RIGHT_BTN_IMPOSSIBLE; i++)
+        {
+            EventManager.Instance.AddListener(i, this);
+        }
+
+        EventManager.Instance.AddListener(EVENT_TYPE.COUNT_DOWN, this);
+        EventManager.Instance.AddListener(EVENT_TYPE.TIME_OVER, this);
+        EventManager.Instance.AddListener(EVENT_TYPE.TIME_START, this);
+        EventManager.Instance.AddListener(EVENT_TYPE.SURVIVOR_DIE, this);
+        EventManager.Instance.AddListener(EVENT_TYPE.SURVIVOR_WIN, this);
+        
 
         if (pv.isMine)
         {
-            Head[0].GetComponent<SkinnedMeshRenderer>().enabled = false;
-            Head[1].SetActive(false);
-            Camera.SetActive(true);
+            head[0].GetComponent<SkinnedMeshRenderer>().enabled = false;
+            head[1].SetActive(false);
+            mainCamera.SetActive(true);
             StartCoroutine(PlayerStateCheck());
             StartCoroutine(PlayerAction());
         }
@@ -149,137 +144,165 @@ public class Survivor : MonoBehaviour, IListener {
 
     void Update()
     {
-        Guage.fillAmount = (sw.ElapsedMilliseconds / 1000) / gaugeAdd;
-        
-		if (!Die && !hit&& !Gram && gameStart && !Radio && !Key)
+
+        guage.fillAmount = (sw.ElapsedMilliseconds / 1000) / time;
+
+        //Debug.Log(HeartBeat);
+        if (!die && !hit && !gram && gameStart && !radio && !key)
         {
             if (pv.isMine)
             {
-                Horizontal = Input.GetAxis("Horizontal");
-                Vertical = Input.GetAxis("Vertical");
-                Rotate = Input.GetAxis("Oculus_GearVR_RThumbstickX") * SpeedRotation; // 회전
+                horizontal = Input.GetAxis("Horizontal");
+                vertical = Input.GetAxis("Vertical");
+                rotate = Input.GetAxis("Oculus_GearVR_RThumbstickX") * speedRotation; // 회전
 
                 if (Input.GetButtonDown("Jump"))
                 {
-                    Run = true;
-                }
-                else if (Input.GetButtonUp("Jump"))
-                {
-                    Run = false;
+                    run = true;
                 }
 
-                Vector3 desiredMove = transform.forward * Vertical + transform.right * Horizontal;
-                MoveDirection.x = desiredMove.x * SurivivorSpeed;
-                MoveDirection.y -= 9.8f;
-                MoveDirection.z = desiredMove.z * SurivivorSpeed;
-                Controller.Move(MoveDirection * Time.deltaTime);
-                transform.Rotate(0, Rotate * Time.deltaTime, 0);
+                else if (Input.GetButtonUp("Jump"))
+                {
+                    run = false;
+                }
+                /*
+                if (Input.GetButtonDown("Fire1"))
+                {
+                    m_IsCrouch = !m_IsCrouch;
+                    survivor_audio.PlayAudio("CROUCH", true);
+                }
+                */
+
+                Vector3 desiredMove = transform.forward * vertical + transform.right * horizontal;
+
+
+                moveDirection.x = desiredMove.x * speed;
+                moveDirection.y -= 9.8f;
+                moveDirection.z = desiredMove.z * speed;
+
+                characterController.Move(moveDirection * Time.deltaTime);
+
+
+                transform.Rotate(0, rotate * Time.deltaTime, 0);
             }
 
             else
             {
-                PlayerTr.position = Vector3.Lerp(PlayerTr.position, currPos, Time.deltaTime * 3f);
-                PlayerTr.rotation = Quaternion.Slerp(PlayerTr.rotation, currRot, Time.deltaTime * 3f);
+                playerTr.position = Vector3.Lerp(playerTr.position, currPos, Time.deltaTime * 3f);
+                playerTr.rotation = Quaternion.Slerp(playerTr.rotation, currRot, Time.deltaTime * 3f);
 
             }
         }
 
         #region Audio
-		if (survivor_audio.isAudioPlay()){
-			string playAudioType="";
-            if (Animator.GetCurrentAnimatorStateInfo(0).IsName("Basic_Walk_01"))
+        if (survivor_audio.GetCheck())
+            if (animator.GetCurrentAnimatorStateInfo(0).IsName("Basic_Walk_01"))
             {
-				playAudioType="WALK";
+                survivor_audio.PlayAudio("WALK");
             }
-            else if (Animator.GetCurrentAnimatorStateInfo(0).IsName("Basic_Run_02"))
+            else if (animator.GetCurrentAnimatorStateInfo(0).IsName("Basic_Run_02"))
             {
-				playAudioType="RUN";   
-            }
-            else if (Animator.GetCurrentAnimatorStateInfo(0).IsName("HumanoidCrouchWalk 0"))
-            {
-				playAudioType="CROUCH_WALK";    
-            }
-            else if (Animator.GetCurrentAnimatorStateInfo(0).IsName("HumanoidIdle"))
-            {
-				playAudioType="NOT";  
-            }
-			if(playAudioType!=""){
-			survivor_audio.PlayAudio(playAudioType);
-			}
-		}
-            #endregion
-    }
 
-    void OnPhotonSerializeView(PhotonStream stream, PhotonMessageInfo info)
+                survivor_audio.PlayAudio("RUN");
+            }
+            else if (animator.GetCurrentAnimatorStateInfo(0).IsName("HumanoidCrouchWalk 0"))
+            {
+                survivor_audio.PlayAudio("CROUCH_WALK");
+            }
+            else if (animator.GetCurrentAnimatorStateInfo(0).IsName("HumanoidIdle"))
+            {
+                survivor_audio.PlayAudio("NOT");
+            }
+
+        /*
+        if(survivor_heart_audio.GetCheck())
+            survivor_heart_audio.PlayAudio("HEART_SPEED_UP", true);
+        */
+#endregion
+            }
+
+            #region
+            void OnPhotonSerializeView(PhotonStream stream, PhotonMessageInfo info)
     {
         if (stream.isWriting)
         {
-            stream.SendNext(PlayerTr.position);
-            stream.SendNext(PlayerTr.rotation);
-            stream.SendNext((int)Playerstate);
+            stream.SendNext(playerTr.position);
+            stream.SendNext(playerTr.rotation);
+            stream.SendNext((int)playerState);
         }
         else
         {
             currPos = (Vector3)stream.ReceiveNext();
             currRot = (Quaternion)stream.ReceiveNext();
-            State = (int)stream.ReceiveNext();
+            state = (int)stream.ReceiveNext();
+
         }
     }
+    #endregion
 
     #region
     IEnumerator PlayerStateCheck()
     {
+
         while (true)
         {
-            if (Horizontal == 0 && Vertical == 0 && Rotate == 0)
-            {
-				if (Crouch) {
-					Playerstate = PlayerState.Crouch;
-				} else {
-					Playerstate=PlayerState.Idle;
-				}
 
-            }
-            else if (Horizontal != 0 || Vertical != 0 || Rotate != 0)
+            if (horizontal == 0 && vertical == 0 && rotate == 0)
             {
-                if (Crouch)
+
+                if (crouch)
+                    playerState = PlayerState.Crouch;
+                else
                 {
-                    if (Playerstate == PlayerState.Crouch)
-                        Playerstate = PlayerState.CrouchWalk;
-                    else if (Playerstate != PlayerState.CrouchWalk)
-                        Playerstate = PlayerState.Crouch;
+
+                    playerState = PlayerState.Idle;
+                }
+            }
+
+            else if (horizontal != 0 || vertical != 0 || rotate != 0)
+            {
+                if (crouch)
+                {
+                    if (playerState == PlayerState.Crouch)
+                        playerState = PlayerState.CrouchWalk;
+                    else if (playerState != PlayerState.CrouchWalk)
+                        playerState = PlayerState.Crouch;
                 }
 
                 else
                 {
-                    if (Playerstate == PlayerState.CrouchWalk)
-                        Playerstate = PlayerState.Crouch;
-                    else if (Playerstate == PlayerState.Crouch)
-                        Playerstate = PlayerState.Idle;
+                    if (playerState == PlayerState.CrouchWalk)
+                        playerState = PlayerState.Crouch;
+                    else if (playerState == PlayerState.Crouch)
+                        playerState = PlayerState.Idle;
                     else
                     {
-						Playerstate = PlayerState.Walk;
-						if (Run)
-							Playerstate = PlayerState.Run;
+                        playerState = PlayerState.Walk;
+                        if (run)
+                            playerState = PlayerState.Run;
                     }
                 }
 
             }
 
-            if (Die)
+            if (die)
             {
-                Playerstate = PlayerState.Die;              
+                //Debug.Log("Death");
+                playerState = PlayerState.Die;
+               
             }
-			if (Playerstate != PlayerState.Die && hit)
+
+            if (playerState != PlayerState.Die && hit)
             {
-                Playerstate = PlayerState.Hit;
+                playerState = PlayerState.Hit;
+
             }
-            if (Gram)
-                Playerstate = PlayerState.Gram;
-            if (Radio)
-                Playerstate = PlayerState.Radio;
-            if (Key)
-                Playerstate = PlayerState.Key;
+            if (gram)
+                playerState = PlayerState.Gram;
+            if (radio)
+                playerState = PlayerState.Radio;
+            if (key)
+                playerState = PlayerState.Key;
             yield return null;
         }
     }
@@ -288,57 +311,68 @@ public class Survivor : MonoBehaviour, IListener {
     #region
     IEnumerator PlayerAction()
     {
+
         while (true)
         {
-			string animationType="";
-            switch (Playerstate)
+
+            switch (playerState)
             {
-				case PlayerState.Idle:
-					animationType = "Idle";
+                case PlayerState.Idle:
+
+                    AnimationExcute("Idle");
+
                     break;
+
                 case PlayerState.Walk:
-					animationType = "Walk";
-                    SurivivorSpeed = WalkSpeed;
-                   
+                    speed = walkSpeed;
+                    AnimationExcute("Walk");
+
                     break;
+
                 case PlayerState.Run:
-				animationType = "Run";
-                    SurivivorSpeed = RunSpeed;
-              
+                    speed = runSpeed;
+                    AnimationExcute("Run");
+
                     break;
+
                 case PlayerState.Crouch:
-				animationType = "Crouch";
-                  
+                    AnimationExcute("Crouch");
+
                     break;
                 case PlayerState.CrouchWalk:
-				animationType = "CrouchWalk";
-                    SurivivorSpeed = WalkSpeed;
-                  
+                    speed = walkSpeed;
+                    AnimationExcute("CrouchWalk");
+
                     break;
+
                 case PlayerState.Hit:
-				animationType = "Hit";
-                   
+
+                    AnimationExcute("Hit");
+
                     break;
                 case PlayerState.Die:
-				animationType = "Die";
-                  
+
+                    AnimationExcute("Die");
                     EventManager.Instance.PostNotification(EVENT_TYPE.SURVIVOR_DIE, this);
                     break;
                 case PlayerState.Gram:
-				animationType = "Gram";
-                  
+
+                    AnimationExcute("Gram");
+
                     break;
                 case PlayerState.Radio:
-				animationType = "Radio";
-                    
+
+                    AnimationExcute("Radio");
+
                     break;
+
                 case PlayerState.Key:
-				animationType = "Key";
-                    
+
+                    AnimationExcute("Key");
+
                     break;
+
             }
-			if(animationType !="")
-				AnimationExcute(animationType);
             yield return null;
         }
 
@@ -348,16 +382,16 @@ public class Survivor : MonoBehaviour, IListener {
     public void sendMoveEvent(bool flag,string trap)
     {
 
-        if (!Moving && flag)
+        if (!moving && flag)
         {
             EventManager.Instance.PostNotification(EVENT_TYPE.SURVIVOR_MOVE, this);
-            Moving = true;
+            moving = true;
         }
 
-        else if (Moving && !flag)
+        else if (moving && !flag)
         {
             EventManager.Instance.PostNotification(EVENT_TYPE.SURVIVOR_STOP, this);
-            Moving = false;
+            moving = false;
         }
         if(!trap.Equals(""))
         {
@@ -367,125 +401,121 @@ public class Survivor : MonoBehaviour, IListener {
 
     public bool getGramCtrl()
     {
-        return Gram;
+        return gram;
     }
     public void setGramCtrl(bool flag)
     {
 
-        Gram = flag;
+        gram = flag;
     }
 
     public bool getItemKey()
     {
-        return ItemKey;
+        return itemKey;
     }
     public void setItemKey(bool flag)
     {
 
-        ItemKey = flag;
+        itemKey = flag;
     }
     public bool getRadioCtrl()
     {
-        return Radio;
+        return radio;
     }
     public void setRadioCtrl(bool flag)
     {
 
-        Radio = flag;
+        radio = flag;
     }
 
     public bool getKeyCtrl()
     {
-        return Key;
+        return key;
     }
     public void setKeyCtrl(bool flag)
     {
-        Key = flag;
-    }
 
-    public Animator GetAni()
-    {
-        return Animator;
+        key = flag;
     }
 
     #region
     IEnumerator RemotePlayerAction()
     {
+
         while (true)
         {
-			string animationType = "";
 
-            switch (State)
+            switch (state)
             {
-			case (int)PlayerState.Idle:
-					animationType = "Idle";
+                case (int)PlayerState.Idle:
+
                     sendMoveEvent(false,"");
-                   
+                    AnimationExcute("Idle");
+
                     break;
 
                 case (int)PlayerState.Walk:
-				animationType = "Walk";
                     sendMoveEvent(false, "");
-                    SurivivorSpeed = WalkSpeed;
-               
+                    speed = walkSpeed;
+                    AnimationExcute("Walk");
+
+
                     break;
 
                 case (int)PlayerState.Run:
-				animationType = "Run";
                     sendMoveEvent(true, "");
-                    SurivivorSpeed = RunSpeed;
-                    
+                    speed = runSpeed;
+                    AnimationExcute("Run");
+
                     break;
 
                 case (int)PlayerState.Crouch:
-				animationType = "Crouch";
                     sendMoveEvent(false, "");
-                   
+                    AnimationExcute("Crouch");
+
                     break;
 
                 case (int)PlayerState.CrouchWalk:
-				animationType = "CrouchWalk";
+
                     sendMoveEvent(false, "");
-                    SurivivorSpeed = WalkSpeed;
-                 
+                    speed = walkSpeed;
+                    AnimationExcute("CrouchWalk");
 
                     break;
 
                 case (int)PlayerState.Hit:
-				animationType = "Hit";
+
                     sendMoveEvent(true, "");
-                 
+                    AnimationExcute("Hit");
 
                     break;
 
                 case (int)PlayerState.Die:
-				animationType = "Die";
+
                     sendMoveEvent(true, "");
-                  
+                    AnimationExcute("Die");
                     EventManager.Instance.PostNotification(EVENT_TYPE.SURVIVOR_DIE, this);
                     break;
 
                 case (int)PlayerState.Gram:
-				animationType = "Gram";
+
                     sendMoveEvent(true, "Gram");
-                 
+                    AnimationExcute("Gram");
 
                     break;
                 case (int)PlayerState.Radio:
-				animationType = "Radio";
+
                     sendMoveEvent(true, "Radio");
-                
+                    AnimationExcute("Radio");
 
                     break;
                 case (int)PlayerState.Key:
-				animationType = "Key";
+
                     sendMoveEvent(true, "");
-                   
+                    AnimationExcute("Key");
 
                     break;
             }
-			if(animationType!="")
-				AnimationExcute(animationType);
             yield return null;
         }
 
@@ -502,7 +532,7 @@ public class Survivor : MonoBehaviour, IListener {
 
                 if (pv.isMine && !hit)
                 {
-                    if (Playerstate != PlayerState.Die)
+                    if (playerState != PlayerState.Die)
                     {
                         StartCoroutine("Hit", Param);
                         pv.RPC("Hit", PhotonTargets.Others, Param);
@@ -541,7 +571,8 @@ public class Survivor : MonoBehaviour, IListener {
             case EVENT_TYPE.SURVIVOR_RADIO_SUC:
 
                 if (pv.isMine)
-                {                    
+                {
+                    
                     RadioSuccess();
                     pv.RPC("RadioSuccess", PhotonTargets.Others, null);
                 }
@@ -636,13 +667,13 @@ public class Survivor : MonoBehaviour, IListener {
     public void RadioSuccess()
     {
         EventManager.Instance.PostNotification(EVENT_TYPE.RADIO_SUCCESS, this);
-		audioManager.mongue_audio1.PlayAudio ();
+        audioManager.mongue_audio1.PlayAudio();
     }  // 시체 안치실 열릴 때
 
     [PunRPC]
     public void GramCtrl() 
     {
-        if (Playerstate != PlayerState.Crouch && Playerstate != PlayerState.CrouchWalk)
+        if (playerState != PlayerState.Crouch && playerState != PlayerState.CrouchWalk)
         {
 
             if (!getGramCtrl())
@@ -654,6 +685,7 @@ public class Survivor : MonoBehaviour, IListener {
                 OnBtnRight_B(false);
                 OnGramGuage(true);
             }
+
             else
             {
                 setGramCtrl(false);
@@ -669,7 +701,7 @@ public class Survivor : MonoBehaviour, IListener {
     [PunRPC]
     public void KeyCtrl()
     {
-        if (Playerstate != PlayerState.Crouch && Playerstate != PlayerState.CrouchWalk)
+        if (playerState != PlayerState.Crouch && playerState != PlayerState.CrouchWalk)
         {
             if (!getKeyCtrl())
             {
@@ -690,7 +722,7 @@ public class Survivor : MonoBehaviour, IListener {
     [PunRPC]
     public void KeyCtrl2()
     {
-        if (Playerstate != PlayerState.Crouch && Playerstate != PlayerState.CrouchWalk)
+        if (playerState != PlayerState.Crouch && playerState != PlayerState.CrouchWalk)
         {
             if (!getKeyCtrl())
             {
@@ -711,7 +743,7 @@ public class Survivor : MonoBehaviour, IListener {
     [PunRPC]
     public void RadioCtrl(object Param)
     {
-        if (Playerstate != PlayerState.Crouch && Playerstate != PlayerState.CrouchWalk)
+        if (playerState != PlayerState.Crouch && playerState != PlayerState.CrouchWalk)
         {
             if (Param == null)
             {
@@ -735,7 +767,7 @@ public class Survivor : MonoBehaviour, IListener {
             else
             {
                 audioManager.radio_BGM_Audio.SetVolume();
-                Animator.SetBool("RadioCtrl", true); // 한 번씩 작동될때
+                animator.SetBool("RadioCtrl", true); // 한 번씩 작동될때
                 OnBtnRight_B(false);
             }
         }
@@ -744,19 +776,20 @@ public class Survivor : MonoBehaviour, IListener {
     [PunRPC]
     public IEnumerator Hit(object Param)
     {
-		Playerstate = PlayerState.Hit;
         survivor_audio.PlayAudio("ATTACKED", true);
         int damage = (int)Param;
-        Hp -= damage;
-        Life.fillAmount = Life.fillAmount - 0.25f;
-		hit = true;
+        hp -= damage;
+        life.fillAmount = life.fillAmount - 0.25f;
+        hit = true;
+
         StateHit();
         yield return new WaitForSeconds(hitBreakTime);
-		hit = false;
-        if (Hp <= 0)
+        hit = false;
+
+        if (hp <= 0)
         {
             survivor_audio.PlayAudio("DEATH", true);
-            Die = true;
+            die = true;
         }
 
     }
@@ -785,28 +818,27 @@ public class Survivor : MonoBehaviour, IListener {
     {
         gameStart = false;
         //transform.FindChild("Canvas").transform.FindChild("Panel").transform.FindChild("GameOver").GetComponentInChildren<Animator>().SetTrigger("LOSE");
-        GameOver.GetComponentInChildren<Animator>().SetTrigger("LOSE");
+        gameOver.GetComponentInChildren<Animator>().SetTrigger("LOSE");
     }
     public void SurvivorWin()
     {
         gameStart = false;
         if(pv.isMine)
-            GameOver.GetComponentInChildren<Animator>().SetTrigger("WIN");
+            gameOver.GetComponentInChildren<Animator>().SetTrigger("WIN");
     }
     public void OnTimerEnd()
     {
         gameStart = false;
         //transform.FindChild("Canvas").transform.FindChild("Panel").transform.FindChild("GameOver").GetComponentInChildren<Animator>().SetTrigger("LOSE");
-        GameOver.GetComponentInChildren<Animator>().SetTrigger("LOSE");
+        gameOver.GetComponentInChildren<Animator>().SetTrigger("LOSE");
     }
     public void OnCountDown()
     {
        // transform.FindChild("Canvas").transform.FindChild("Panel").transform.FindChild("CountDown").GetComponentInChildren<Animator>().SetTrigger("COUNTDOWN");
-        CountDown.GetComponentInChildren<Animator>().SetTrigger("COUNTDOWN");
+        countDown.GetComponentInChildren<Animator>().SetTrigger("COUNTDOWN");
         etcAudio.PlayAudio("COUNTDOWN");
     }
     #endregion
-
     public void OnCountEnd()
     {
         EventManager.Instance.PostNotification(EVENT_TYPE.TIME_START, this);
@@ -817,46 +849,43 @@ public class Survivor : MonoBehaviour, IListener {
         KeyCtrl();
     }
 
-    public PhotonView GetPhotonView()
-    {
-        return pv;
-    }
-
     public void OnBtnRight_B(bool flag)
     {
-        JoyRightBtn.GetComponentInChildren<Animator>().SetBool("Btn_B", flag);
+        joyRightBtn.GetComponentInChildren<Animator>().SetBool("Btn_B", flag);
     }
     
     public void OnBtnLeft_R(bool flag)
     {
-        JoyLeftBtn.GetComponentInChildren<Animator>().SetBool("Btn_L", flag);
+        joyLeftBtn.GetComponentInChildren<Animator>().SetBool("Btn_L", flag);
     }
     public void OnGramGuage(bool flag)
     {
-        if (flag)
+        if(flag)
         {
-            sw.Start();         
+            gramGuage.gameObject.SetActive(flag);
+            sw.Start();
+            
         }
         else
         {
+            gramGuage.gameObject.SetActive(flag);
             sw.Stop();
         }
-        GramGuage.gameObject.SetActive(flag);
     }
     public void AnimationExcute(string name)
     {
 
-        Animator.SetBool("Idle", false);
-        Animator.SetBool("Walk", false);
-        Animator.SetBool("Run", false);
-        Animator.SetBool("Crouch", false);
-        Animator.SetBool("CrouchWalk", false);
-        Animator.SetBool("Die", false);
-        Animator.SetBool("Hit", false);
-        Animator.SetBool("Gram", false);
-        Animator.SetBool("Radio", false);
-        Animator.SetBool("Key", false);
-        Animator.SetBool(name, true);
+        animator.SetBool("Idle", false);
+        animator.SetBool("Walk", false);
+        animator.SetBool("Run", false);
+        animator.SetBool("Crouch", false);
+        animator.SetBool("CrouchWalk", false);
+        animator.SetBool("Die", false);
+        animator.SetBool("Hit", false);
+        animator.SetBool("Gram", false);
+        animator.SetBool("Radio", false);
+        animator.SetBool("Key", false);
+        animator.SetBool(name, true);
     }
   
 }
