@@ -54,8 +54,6 @@ public class Survivor : MonoBehaviour, IListener {
     private int hp;
     private bool itemKey;
     private bool moving;
-
-
     private bool gameStart;
 
     [Header("Photon Settings")]
@@ -68,12 +66,8 @@ public class Survivor : MonoBehaviour, IListener {
     [Header("Audio Settings")]
     public Survivor_Audio survivor_audio;
     public Survivor_Audio2 survivor_heart_audio;
-    private int HeartBeat = 0;
     public Etc_Audio etcAudio;
     public AudioManager audioManager;
-
-    float cooltime = 19f;
-    float leftTime = 19f;
 
     Stopwatch sw;
     #endregion
@@ -142,13 +136,18 @@ public class Survivor : MonoBehaviour, IListener {
         audioManager = GameObject.FindGameObjectWithTag("AUDIO").GetComponent<AudioManager>();
     }
 
+    private bool IsCanMoving()
+    {
+        return !die && !hit && !gram && gameStart && !radio && !key;
+    }
+
     void Update()
     {
 
         guage.fillAmount = (sw.ElapsedMilliseconds / 1000) / time;
 
         //Debug.Log(HeartBeat);
-        if (!die && !hit && !gram && gameStart && !radio && !key)
+        if (IsCanMoving())
         {
             if (pv.isMine)
             {
@@ -202,7 +201,6 @@ public class Survivor : MonoBehaviour, IListener {
             }
             else if (animator.GetCurrentAnimatorStateInfo(0).IsName("Basic_Run_02"))
             {
-
                 survivor_audio.PlayAudio("RUN");
             }
             else if (animator.GetCurrentAnimatorStateInfo(0).IsName("HumanoidCrouchWalk 0"))
@@ -249,14 +247,7 @@ public class Survivor : MonoBehaviour, IListener {
 
             if (horizontal == 0 && vertical == 0 && rotate == 0)
             {
-
-                if (crouch)
-                    playerState = PlayerState.Crouch;
-                else
-                {
-
-                    playerState = PlayerState.Idle;
-                }
+                playerState = crouch ? PlayerState.Crouch : PlayerState.Idle;
             }
 
             else if (horizontal != 0 || vertical != 0 || rotate != 0)
@@ -277,9 +268,7 @@ public class Survivor : MonoBehaviour, IListener {
                         playerState = PlayerState.Idle;
                     else
                     {
-                        playerState = PlayerState.Walk;
-                        if (run)
-                            playerState = PlayerState.Run;
+                        playerState = run ? PlayerState.Run : PlayerState.Walk;
                     }
                 }
 
@@ -530,13 +519,10 @@ public class Survivor : MonoBehaviour, IListener {
 
             case EVENT_TYPE.SURVIVOR_HIT:
 
-                if (pv.isMine && !hit)
-                {
-                    if (playerState != PlayerState.Die)
-                    {
-                        StartCoroutine("Hit", Param);
-                        pv.RPC("Hit", PhotonTargets.Others, Param);
-                    }
+                if (pv.isMine && !hit && playerState != PlayerState.Die)
+                {                   
+                    StartCoroutine("Hit", Param);
+                    pv.RPC("Hit", PhotonTargets.Others, Param);                  
                 }
 
                 break;
