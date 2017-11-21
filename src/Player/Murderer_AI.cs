@@ -15,6 +15,11 @@ public class Murderer_AI : MonoBehaviour, IListener {
     private bool attack;
     private int damage;
     public Murderer_STATE murder_state;
+
+    private string attackType1 = "Attack1";
+    private string attackType2 = "Attack2";
+    private string attackType3 = "Attack3";
+
     // Use this for initialization
     void Start () {
         EventManager.Instance.AddListener(EVENT_TYPE.TIME_OVER, this);
@@ -50,17 +55,17 @@ public class Murderer_AI : MonoBehaviour, IListener {
 	}
 	IEnumerator Attack1(){
         naviAgnt.Stop ();
-        animator.SetTrigger ("Attack1");
+        animator.SetTrigger (attackType1);
 		yield return null;
 	}
 	IEnumerator Attack2(){
         naviAgnt.Stop ();
-        animator.SetTrigger ("Attack2");
+        animator.SetTrigger (attackType2);
 		yield return null;
 	}
 	IEnumerator Attack3(){
         naviAgnt.Stop ();
-        animator.SetTrigger ("Attack3");
+        animator.SetTrigger (attackType3);
 		yield return null;
 	}
 	IEnumerator Idle(){
@@ -93,7 +98,7 @@ public class Murderer_AI : MonoBehaviour, IListener {
 		
 		StopAllCoroutines ();
 	}
-    public Animator GetAni()
+    public Animator IsAni()
     {
         return animator;
     }
