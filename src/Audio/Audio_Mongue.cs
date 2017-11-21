@@ -4,10 +4,9 @@ using UnityEngine;
 
 public class Audio_Mongue : MonoBehaviour {
 
-    [SerializeField]
-    private AudioSource source;
-    [SerializeField]
-    private AudioClip clip;
+    public AudioSource source;
+
+    public AudioClip clip;
     private bool isUse = false;
 
     void Start()

@@ -29,19 +29,21 @@ public class KeyItem2 : MonoBehaviour, IListener {
             
             Vector3 viewPos = Camera.main.WorldToViewportPoint(Object.GetComponent<Transform>().position); // 카메라 뷰포트로 변환
 
-            if (IsAbleGetKey(viewPos))
+           
+            if (possible && viewPos.x > 0.1f && viewPos.x < 0.9f && viewPos.y > 0.1f && viewPos.y < 0.9f)
             {
-                EventManager.Instance.PostNotification(EVENT_TYPE.KEY_GET2, this);                               
+
+                if (Input.GetButtonDown("Fire2"))
+                {
+
+                    EventManager.Instance.PostNotification(EVENT_TYPE.KEY_GET2, this);
+                    
+                }
             }
 
             yield return null;
         }
 
-    }
-
-    bool IsAbleGetKey(Vector3 viewPos)
-    {
-        return possible && viewPos.x > 0.1f && viewPos.x < 0.9f && viewPos.y > 0.1f && viewPos.y < 0.9f && Input.GetButtonDown("Fire2");
     }
 
     void OnTriggerEnter(Collider col)
@@ -71,6 +73,9 @@ public class KeyItem2 : MonoBehaviour, IListener {
             case EVENT_TYPE.SURVIVOR_CREATE:
 
                 survivor = GameObject.FindGameObjectWithTag("SURVIVOR").GetComponent<Survivor>();
+
+              
+
                 break;
             case EVENT_TYPE.KEY_GET_SUCCESS2:
                 //keyAudio.PlayAudio();
@@ -80,7 +85,7 @@ public class KeyItem2 : MonoBehaviour, IListener {
 
             case EVENT_TYPE.GRAM_OPEN_KEY:
 
-                if (survivor.GetPhotonView().isMine)
+                if (survivor.pv.isMine)
                 {
                     open = true;
                     StartCoroutine(CheckKeyItem()); //코루틴 실행

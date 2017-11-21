@@ -4,67 +4,66 @@ using UnityEngine;
 
 public class Murder_Audio : AudioController
 {
-    public AudioClip AUDIO_RUN;
-    public AudioClip AUDIO_WALK;
-    public AudioClip AUDIO_ATTACK_CRY;
-    public AudioClip AUDIO_DEATH;
+    public AudioClip Audio_Run;
+    public AudioClip Audio_Walk;
+    public AudioClip Audio_Attack_cry;
+    public AudioClip Audio_Death;
     private float playTime = 1.0f;
-    public bool checkMurderDeath = true;
+    public bool RepeatCheck_Death = true;
 
     void Start()
     {
         base.Init();
     }
 
-    public void PlayAudio(AudioType audiotype, bool isOneSound = false)
+    public void PlayAudio(string audioName, bool isOneSound = false)
     {
-        if (isOneSound == false)
+        if (audioSource != null)
         {
-            switch (audiotype)
+            if (isOneSound == false)
             {
-                case AudioType.MURDER_RUN:
-                    audioSource.clip = AUDIO_RUN;
-                    break;
-                case AudioType.MURDER_WALK:
-                    audioSource.clip = AUDIO_WALK;
-                    break;
-                case AudioType.NOT:
-                    audioSource.clip = null;
-                    audioSource.Stop();
-                    break;
-                default:
-                    Debug.LogError("잘못된 오디오 명을 입력하셨습니다.(Murder)");
-                    break;
+                switch (audioName)
+                {
+                    case "RUN":
+                        audioSource.clip = Audio_Run;
+                        break;
+                    case "WALK":
+                        audioSource.clip = Audio_Walk;
+                        break;
+                    case "NOT":
+                        audioSource.clip = null;
+                        audioSource.Stop();
+                        break;
+                    default:
+                        Debug.LogError("잘못된 오디오 명을 입력하셨습니다.(Murder)");
+                        break;
+                }
+                PlayCurrentAudio();
             }
-            PlayCurrentAudio();
-        }
-        else
-        {
-            switch (audiotype)
+            else
             {
-                case AudioType.MURDER_ATTACK:
-                    if (isAudioPlay())
-                    { 
-                        audioSource.clip = AUDIO_ATTACK_CRY;
+                switch (audioName)
+                {
+                    case "ATTACK":
+                        audioSource.clip = Audio_Attack_cry;
                         playTime = 1.2f;
-                    }
-                    break;
-                case AudioType.MURDER_DEATH:
-                    if (checkMurderDeath == true)
-                    {
-                        audioSource.clip = AUDIO_DEATH;
-                        checkMurderDeath = false;
-                        playTime = audioSource.clip.length;
-                    }
-                    break;
-                default:
-                    Debug.LogError("잘못된 오디오 명을 입력하셨습니다.(Survivor)");
-                    break;
+                        break;
+                    case "DEATH":
+                        if (RepeatCheck_Death == true)
+                        {
+                            audioSource.clip = Audio_Death;
+                            RepeatCheck_Death = false;
+                            playTime = audioSource.clip.length;
+                        }
+                        break;
+                    default:
+                        Debug.LogError("잘못된 오디오 명을 입력하셨습니다.(Survivor)");
+                        break;
+                }
+                // PlayCurrentAudioRightly();             
+                if (audioSource.clip != null)
+                    StartCoroutine(TestAudio(playTime));
             }
-            // PlayCurrentAudioRightly();             
-            if (audioSource.clip != null)
-                StartCoroutine(TestAudio(playTime));
         }
     }
-    
 }

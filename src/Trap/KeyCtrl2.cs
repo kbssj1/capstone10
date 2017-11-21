@@ -5,13 +5,12 @@ using UnityEngine;
 public class KeyCtrl2 : MonoBehaviour ,IListener {
 
     private Survivor survivor;
-    [SerializeField]
-    private GameObject key;
+
+    public GameObject Object;
     private bool possible;
-    [SerializeField]
-    private GameObject Elevator;
-    [SerializeField]
-    private GameObject Ele_Door;
+
+    public GameObject Elevator;
+    public GameObject Ele_Door;
 
 
 
@@ -30,22 +29,21 @@ public class KeyCtrl2 : MonoBehaviour ,IListener {
         while (true)
         {
 
-            Vector3 viewPos = Camera.main.WorldToViewportPoint(key.GetComponent<Transform>().position); // 카메라 뷰포트로 변환
+            Vector3 viewPos = Camera.main.WorldToViewportPoint(Object.GetComponent<Transform>().position); // 카메라 뷰포트로 변환
 
           
-            if (IsAbleKeyOpen(viewPos))
+            if (possible && viewPos.x > 0.1f && viewPos.x < 0.9f && viewPos.y > 0.1f && viewPos.y < 0.9f)
             {
-                KeyOpen();
+
+                if (Input.GetButtonDown("Fire2") && survivor.getItemKey())
+                {
+                    KeyOpen();
+                }
             }
 
             yield return null;
         }
 
-    }
-
-    bool IsAbleKeyOpen(Vector3 viewPos)
-    {
-        return possible && viewPos.x > 0.1f && viewPos.x < 0.9f && viewPos.y > 0.1f && viewPos.y < 0.9f && Input.GetButtonDown("Fire2") && survivor.getItemKey();
     }
 
     void OnTriggerEnter(Collider col)
@@ -91,7 +89,7 @@ public class KeyCtrl2 : MonoBehaviour ,IListener {
 
                 survivor = GameObject.FindGameObjectWithTag("SURVIVOR").GetComponent<Survivor>();
 
-                if (survivor.GetPhotonView().isMine)
+                if (survivor.pv.isMine)
                 {
                     StartCoroutine(CheckKeyCtrl()); //코루틴 실행
 

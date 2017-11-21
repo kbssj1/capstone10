@@ -6,9 +6,8 @@ public class KeyItem : MonoBehaviour, IListener
 {
 
     private Survivor survivor;
-    [SerializeField]
-    private GameObject key;
 
+    public GameObject Object;
     private bool open;
     private bool possible;
     // Use this for initialization
@@ -28,22 +27,23 @@ public class KeyItem : MonoBehaviour, IListener
         while (true)
         {
 
-            Vector3 viewPos = Camera.main.WorldToViewportPoint(key.GetComponent<Transform>().position); // 카메라 뷰포트로 변환
+            Vector3 viewPos = Camera.main.WorldToViewportPoint(Object.GetComponent<Transform>().position); // 카메라 뷰포트로 변환
 
            
-            if (IsAbleGetKey(viewPos))
-            {              
-                EventManager.Instance.PostNotification(EVENT_TYPE.KEY_GET, this);           
+            if (possible && viewPos.x > 0.1f && viewPos.x < 0.9f && viewPos.y > 0.1f && viewPos.y < 0.9f)
+            {
+              
+                if (Input.GetButtonDown("Fire2"))
+                {
+                    
+                    EventManager.Instance.PostNotification(EVENT_TYPE.KEY_GET, this);
+
+                }
             }
 
             yield return null;
         }
 
-    }
-
-    bool IsAbleGetKey(Vector3 viewPos)
-    {
-        return possible && viewPos.x > 0.1f && viewPos.x < 0.9f && viewPos.y > 0.1f && viewPos.y < 0.9f && Input.GetButtonDown("Fire2");
     }
 
     void OnTriggerEnter(Collider col)
@@ -80,13 +80,13 @@ public class KeyItem : MonoBehaviour, IListener
                 break;
             case EVENT_TYPE.KEY_GET_SUCCESS:
                 //key_audio.PlayAudio();
-                key.SetActive(false);
+                Object.SetActive(false);
                 EventManager.Instance.PostNotification(EVENT_TYPE.B_RIGHT_BTN_IMPOSSIBLE, this);
                 break;
 
             case EVENT_TYPE.RADIO_OPEN_KEY:
 
-                if (survivor.GetPhotonView().isMine)
+                if (survivor.pv.isMine)
                 {
                     open = true;
                     StartCoroutine(CheckKeyItem()); //코루틴 실행

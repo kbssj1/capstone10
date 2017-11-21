@@ -17,53 +17,55 @@ public class Survivor_Audio : AudioController {
     }
 
     public void PlayAudio(string audioName, bool isOneSound = false)
-    {      
-        if (isOneSound == false)
+    {
+        if (audioSource != null)
         {
-            switch (audioName)
+            if (isOneSound == false)
             {
-                case "RUN":
-                    audioSource.clip = Audio_Run;
-                    break;
-                case "WALK":
-                    audioSource.clip = Audio_Walk;
-                    break;
-                case "CROUCH_WALK":
-                    audioSource.clip = Audio_crouch_walk;
-                    break;
-                case "NOT":
-                    audioSource.clip = null;
-                    audioSource.Stop();
-                    break;
-                default:
-                    Debug.LogError("잘못된 오디오 명을 입력하셨습니다.(Survivor)");
-                    break;
+                switch (audioName)
+                {
+                    case "RUN":
+                        audioSource.clip = Audio_Run;
+                        break;
+                    case "WALK":
+                        audioSource.clip = Audio_Walk;
+                        break;
+                    case "CROUCH_WALK":
+                        audioSource.clip = Audio_crouch_walk;
+                        break;
+                    case "NOT":
+                        audioSource.clip = null;
+                        audioSource.Stop();
+                        break;
+                    default:
+                        Debug.LogError("잘못된 오디오 명을 입력하셨습니다.(Survivor)");
+                        break;
+                }
+                PlayCurrentAudio();
             }
-            PlayCurrentAudio();
-        }
-        else
-        {
-            switch (audioName)
+            else
             {
-                case "CROUCH":
-                    audioSource.clip = Audio_crouch;
-                    break;
-                case "ATTACKED":
-                    audioSource.clip = Audio_GetDamage_Cry;
-                    break;
-                case "DEATH":
-                    audioSource.clip = Audio_Death;
-                    break;
-                default:
-                    Debug.LogError("잘못된 오디오 명을 입력하셨습니다.(Survivor)");
-                    break;
-            }
-            // PlayCurrentAudioRightly();               
-            if (audioSource.clip != null)
-                StartCoroutine(TestAudio(audioSource.clip.length));
+                switch (audioName)
+                {
+                    case "CROUCH":
+                        audioSource.clip = Audio_crouch;
+                        break;
+                    case "ATTACKED":
+                        audioSource.clip = Audio_GetDamage_Cry;
+                        break;
+                    case "DEATH":
+                        audioSource.clip = Audio_Death;
+                        break;
+                    default:
+                        Debug.LogError("잘못된 오디오 명을 입력하셨습니다.(Survivor)");
+                        break;
+                }
+                // PlayCurrentAudioRightly();               
+                if (audioSource.clip != null)
+                    StartCoroutine(TestAudio(audioSource.clip.length));
                 
+            }
         }
     }
-    
    
 }

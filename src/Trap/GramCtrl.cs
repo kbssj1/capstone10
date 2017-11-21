@@ -29,6 +29,7 @@ public class GramCtrl : MonoBehaviour, IListener
         StartCoroutine(TimeCheck());
     }
 
+ 
     IEnumerator CheckGramCtrl() // 
     {
         yield return null;
@@ -37,31 +38,34 @@ public class GramCtrl : MonoBehaviour, IListener
         {
 
             Vector3 viewPos = Camera.main.WorldToViewportPoint(Object.GetComponent<Transform>().position); // 카메라 뷰포트로 변환
-      
-            if (IsAbleGramControl(viewPos))
-            {              
-                    if (survivor.getGramCtrl())
+
+         
+            if (possible && viewPos.x > 0.1f && viewPos.x < 0.9f && viewPos.y > 0.1f && viewPos.y < 0.9f)
+            {
+
+                if (Input.GetButtonDown("Fire2"))
+                {
+
+                    if (survivor != null && survivor.getGramCtrl())
                     {
                         sw.Stop();
+
                     }
-                    else if (!survivor.getGramCtrl())
+                    else if (survivor != null && !survivor.getGramCtrl())
                     {
                         sw.Start();
                     }
+
                     survivor.GetComponent<GramTrap>().enabled = true;
-                    EventManager.Instance.PostNotification(EVENT_TYPE.SURVIVOR_GRAMCTRL, this);              
+                    EventManager.Instance.PostNotification(EVENT_TYPE.SURVIVOR_GRAMCTRL, this);
+                }
+                
             }
             
             yield return null;
         }
 
     }
-
-    private bool IsAbleGramControl(Vector3 viewPos)
-    {
-        return possible && viewPos.x > 0.1f && viewPos.x < 0.9f && viewPos.y > 0.1f && viewPos.y < 0.9f && Input.GetButtonDown("Fire2") && survivor != null;
-    }
-
     public IEnumerator TimeCheck()
     {
 
@@ -95,6 +99,7 @@ public class GramCtrl : MonoBehaviour, IListener
         slide.GetComponent<Animator>().SetBool("Slide", true);
         EventManager.Instance.PostNotification(EVENT_TYPE.GRAM_OPEN_KEY, this);
     }
+
 
     void OnTriggerEnter(Collider col)
     {
@@ -135,7 +140,7 @@ public class GramCtrl : MonoBehaviour, IListener
             case EVENT_TYPE.SURVIVOR_CREATE:
 
                 survivor = GameObject.FindGameObjectWithTag("SURVIVOR").GetComponent<Survivor>();
-                if (survivor.GetPhotonView().isMine)
+                if (survivor.pv.isMine)
                 {
                     StartCoroutine(CheckGramCtrl()); //코루틴 실행
 
@@ -145,7 +150,7 @@ public class GramCtrl : MonoBehaviour, IListener
 
             case EVENT_TYPE.MURDERER_CREATE:
                 Murderer murder= GameObject.FindGameObjectWithTag("MURDERER").GetComponent<Murderer>();
-                if(murder.Pv.isMine)
+                if(murder.m_pv.isMine)
                     outLine.enabled = false;
 
                 break;

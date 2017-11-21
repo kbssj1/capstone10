@@ -16,14 +16,12 @@ public class LobbyManager : MonoBehaviour {
         PhotonNetwork.ConnectUsingSettings(version);
     }
 
-    
-
     void OnConnectedToMaster()
     {
         Debug.Log("Connected Master");
         OnReceivedRoomListUpdate();
         // PhotonNetwork.JoinRandomRoom();
-    }  
+    }
 
     void OnJoinedLobby()
     {
@@ -40,7 +38,7 @@ public class LobbyManager : MonoBehaviour {
     {
         StartCoroutine(this.LoadGameField());
     }
-    
+
     public void OnClikJoinRandomRoom()
     {
         PhotonNetwork.JoinRandomRoom();

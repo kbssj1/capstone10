@@ -18,9 +18,9 @@ public class RadioEnd : StateMachineBehaviour {
 	override public void OnStateExit(Animator animator, AnimatorStateInfo stateInfo, int layerIndex) {
         Survivor survivor = GameObject.FindGameObjectWithTag("SURVIVOR").GetComponent<Survivor>();
         RadioCtrl Radio = GameObject.FindGameObjectWithTag("RADIO").GetComponent<RadioCtrl>();
-        Radio.Pluscnt();
-        survivor.GetAni().SetBool("RadioCtrl", false);
-        GameInformation.cnt_value = Radio.Getcnt();
+        Radio.cnt++;
+        survivor.animator.SetBool("RadioCtrl", false);
+        GameInformation.cnt_value = Radio.cnt;
     }
 
 	// OnStateMove is called right after Animator.OnAnimatorMove(). Code that processes and affects root motion should be implemented here
