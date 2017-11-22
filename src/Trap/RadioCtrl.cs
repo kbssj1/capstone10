@@ -112,7 +112,7 @@ public class RadioCtrl : MonoBehaviour, IListener
             case EVENT_TYPE.MURDERER_CREATE:
 
                 Murderer murder = GameObject.FindGameObjectWithTag("MURDERER").GetComponent<Murderer>();
-                if (murder.m_pv.isMine)
+                if (murder.pv.isMine)
                     outLine.enabled = false;
 
                 break;
