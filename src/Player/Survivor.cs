@@ -194,7 +194,7 @@ public class Survivor : MonoBehaviour, IListener {
         }
 
         #region Audio
-        if (survivor_audio.GetCheck())
+        if (survivor_audio.isAudioPlay())
             if (animator.GetCurrentAnimatorStateInfo(0).IsName("Basic_Walk_01"))
             {
                 survivor_audio.PlayAudio("WALK");
