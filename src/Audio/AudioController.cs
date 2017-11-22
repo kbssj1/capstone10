@@ -47,7 +47,7 @@ public class AudioController : MonoBehaviour
     }
 
 
-    public bool GetCheck()
+    public bool isAudioPlay()
     {
         return Check;
     }
