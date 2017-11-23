@@ -112,12 +112,10 @@ public class Survivor : MonoBehaviour, IListener {
         {
             EventManager.Instance.AddListener(i, this);
         }
-
-        EventManager.Instance.AddListener(EVENT_TYPE.COUNT_DOWN, this);
-        EventManager.Instance.AddListener(EVENT_TYPE.TIME_OVER, this);
-        EventManager.Instance.AddListener(EVENT_TYPE.TIME_START, this);
-        EventManager.Instance.AddListener(EVENT_TYPE.SURVIVOR_DIE, this);
-        EventManager.Instance.AddListener(EVENT_TYPE.SURVIVOR_WIN, this);
+        for (EVENT_TYPE i = EVENT_TYPE.TIME_OVER; i <= EVENT_TYPE.SURVIVOR_DIE; i++)
+        {
+            EventManager.Instance.AddListener(i, this);
+        }
         
 
         if (pv.isMine)
@@ -192,8 +190,11 @@ public class Survivor : MonoBehaviour, IListener {
 
             }
         }
+        PlayAudioSurvivor();
 
-        #region Audio
+    }
+    private void PlayAudioSurvivor()
+    {
         if (survivor_audio.isAudioPlay())
             if (animator.GetCurrentAnimatorStateInfo(0).IsName("Basic_Walk_01"))
             {
@@ -211,16 +212,9 @@ public class Survivor : MonoBehaviour, IListener {
             {
                 survivor_audio.PlayAudio("NOT");
             }
-
-        /*
-        if(survivor_heart_audio.GetCheck())
-            survivor_heart_audio.PlayAudio("HEART_SPEED_UP", true);
-        */
-#endregion
-            }
-
-            #region
-            void OnPhotonSerializeView(PhotonStream stream, PhotonMessageInfo info)
+    }
+    #region
+    void OnPhotonSerializeView(PhotonStream stream, PhotonMessageInfo info)
     {
         if (stream.isWriting)
         {
