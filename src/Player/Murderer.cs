@@ -27,8 +27,7 @@ public class Murderer : MonoBehaviour, IListener
     private float vertical = 0f;
     private float rotate;
 
-    [Header("Character Settings")]
-    public bool die;
+    private bool die;
     private bool attack;
     private bool run;
     private int damage;
@@ -66,7 +65,8 @@ public class Murderer : MonoBehaviour, IListener
     private MeshRenderer surMouseTongue;
 
     // Use this for initialization
-    void Awake()
+
+    void Initailize()
     {
         characterController = GetComponent<CharacterController>();
         playerTr = GetComponent<Transform>();
@@ -87,20 +87,21 @@ public class Murderer : MonoBehaviour, IListener
         gameStart = false;
 
         etcAudio = GameObject.FindGameObjectWithTag("AUDIO").GetComponent<Etc_Audio>();
+    }
 
+    void Awake()
+    {
+        Initailize();
     }
 
 
     void Start()
     {
-        EventManager.Instance.AddListener(EVENT_TYPE.SURVIVOR_MOVE, this);
-        EventManager.Instance.AddListener(EVENT_TYPE.SURVIVOR_STOP, this);
-        EventManager.Instance.AddListener(EVENT_TYPE.TIME_OVER, this);
-        EventManager.Instance.AddListener(EVENT_TYPE.TIME_START, this);
-        EventManager.Instance.AddListener(EVENT_TYPE.SURVIVOR_WIN, this);
-        EventManager.Instance.AddListener(EVENT_TYPE.COUNT_DOWN, this);
-        EventManager.Instance.AddListener(EVENT_TYPE.SURVIVOR_DIE, this);
-        EventManager.Instance.AddListener(EVENT_TYPE.SURVIVOR_CREATE, this);
+        for (EVENT_TYPE i = EVENT_TYPE.SURVIVOR_MOVE; i <= EVENT_TYPE.SURVIVOR_CREATE; i++)
+        {
+            EventManager.Instance.AddListener(i, this);
+        }
+
         print("MurCountDown");
         EventManager.Instance.PostNotification(EVENT_TYPE.COUNT_DOWN, this, true);
         EventManager.Instance.PostNotification(EVENT_TYPE.MURDERER_CREATE, this, true);
@@ -116,12 +117,15 @@ public class Murderer : MonoBehaviour, IListener
         //StartCoroutine(TestAudio());  // For Death Test 
 
     }
-
+    private bool isCharacterMove()
+    {
+        return !die && !attack && gameStart;
+    }
     #region
     void Update()
     {
 
-        if (!die && !attack && gameStart)
+        if (isCharacterMove())
         {
             if (pv.isMine)
             {
