@@ -4,30 +4,33 @@ using UnityEngine.AI;
 
 public class Murderer_AI : MonoBehaviour, IListener {
 
-	[SerializeField]
+    private const int murderAI_damage = 25;
+    private const string attackType1 = "Attack1";
+    private const string attackType2 = "Attack2";
+    private const string attackType3 = "Attack3";
+    [SerializeField]
 	Transform[] patrolPos;
 
 	NavMeshAgent naviAgnt;
 	Animator animator;
-	public bool isAttacking = false;
+	private bool isAttacking = false;
 	public Transform currentPatPos;
-	public Transform tracePos;
+    [SerializeField]
+    private Transform tracePos;
     private bool attack;
     private int damage;
-    public Murderer_STATE murder_state;
+    private Murderer_STATE murder_state;
 
-    private string attackType1 = "Attack1";
-    private string attackType2 = "Attack2";
-    private string attackType3 = "Attack3";
-
+   
+   
     // Use this for initialization
     void Start () {
         EventManager.Instance.AddListener(EVENT_TYPE.TIME_OVER, this);
         EventManager.Instance.AddListener(EVENT_TYPE.TIME_START, this);
         EventManager.Instance.AddListener(EVENT_TYPE.SURVIVOR_DIE, this);
-
+        murder_state = GetComponent<Murderer_STATE>();
         attack = false;
-        damage = 25;
+        damage = murderAI_damage;
         naviAgnt = GetComponent<NavMeshAgent> ();
         animator = GetComponent<Animator> ();
 	}
@@ -137,6 +140,14 @@ public class Murderer_AI : MonoBehaviour, IListener {
     public void OnAttackStart()
     {
         attack = true;
+    }
+    public Transform GetTracePos()
+    {
+        return tracePos;
+    }
+    public void SetisAttacking(bool para)
+    {
+        isAttacking = para;
     }
     void OnTimmerEnd()
     {
