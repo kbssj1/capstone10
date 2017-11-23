@@ -10,13 +10,10 @@ public class Attack : MonoBehaviour {
 
     void OnTriggerEnter(Collider col)
     {
-        if (col.CompareTag("SURVIVOR") && tmp)
-        {
-            if (murderer.getAttacked())
-            {
-                StartCoroutine(Block2Attack());
-                EventManager.Instance.PostNotification(EVENT_TYPE.SURVIVOR_HIT, this, murderer.getDamage());
-            }
+        if (col.CompareTag("SURVIVOR") && tmp && murderer.getAttacked())
+        {          
+            StartCoroutine(Block2Attack());
+            EventManager.Instance.PostNotification(EVENT_TYPE.SURVIVOR_HIT, this, murderer.getDamage());   
         }
 
     }
@@ -27,9 +24,9 @@ public class Attack : MonoBehaviour {
     }
 
 
-    public void PlayNormalAudio()
+    public void PlayIdleWeaponAudio()
     {
-        if (attack_audio.GetCheck())
+        if (attack_audio.isAudioPlay())
             attack_audio.PlayAudio("NORMAL");
     }
 

@@ -130,15 +130,15 @@ public class LobbyManager : MonoBehaviour {
     public void AI_Btn()
     {
        
-        if (GameManager.Instance.Is_AI)
+        if (GameManager.Instance.aIMode)
         {
             AI_Text.text = "2인용";
-            GameManager.Instance.Is_AI = false;
+            GameManager.Instance.aIMode = false;
         }
         else
         {
             AI_Text.text = "1인용";
-            GameManager.Instance.Is_AI = true;
+            GameManager.Instance.aIMode = true;
         }
     }
 
