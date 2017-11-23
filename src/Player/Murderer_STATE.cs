@@ -10,17 +10,17 @@ public class Murderer_STATE : MonoBehaviour {
 		ATTACK
 	}
 	[SerializeField]
-	MurdererAIState _state;
-	Murderer_AI _ai;
-	public Survivor _survivor = null;
-	public bool isIdleEnd = false;
+	MurdererAIState state;
+	Murderer_AI ai;
+	public Survivor survivor = null;
+	public bool idleEnd = false;
 
     public Murder_Audio murder_Audio;
 
     void Start () {
-       
-        _state = MurdererAIState.IDLE;
-		_ai = GetComponent<Murderer_AI> ();
+
+        state = MurdererAIState.IDLE;
+        ai = GetComponent<Murderer_AI> ();
         StartCoroutine(WaitTime());
         
 	}
@@ -37,8 +37,8 @@ public class Murderer_STATE : MonoBehaviour {
     
 	void Update(){
 		try{
-			if(_survivor == null){
-			_survivor = GameObject.FindGameObjectWithTag("SURVIVOR").GetComponent<Survivor>();
+			if(survivor == null){
+                survivor = GameObject.FindGameObjectWithTag("SURVIVOR").GetComponent<Survivor>();
 			}
 		}
 		catch(Exception e){
@@ -46,11 +46,11 @@ public class Murderer_STATE : MonoBehaviour {
 		}
         #region
 
-        if (_ai.GetAni().GetCurrentAnimatorStateInfo(0).IsName("Walk"))
+        if (ai.IsAni().GetCurrentAnimatorStateInfo(0).IsName("Walk"))
         {
             murder_Audio.PlayAudio("WALK");
         }
-        else if (_ai.GetAni().GetCurrentAnimatorStateInfo(0).IsName("Run"))
+        else if (ai.IsAni().GetCurrentAnimatorStateInfo(0).IsName("Run"))
         {
             murder_Audio.PlayAudio("RUN");
         }
@@ -65,42 +65,42 @@ public class Murderer_STATE : MonoBehaviour {
 		while (true) {
 			
 
-			if (_survivor != null) {
+			if (survivor != null) {
 				//Debug.Log (Vector3.Distance (transform.position, _survivor.transform.position));
-				if (Vector3.Distance (transform.position, _survivor.transform.position) < 2.0f) {
-					_state = MurdererAIState.ATTACK;
-					_ai.StopAIRoutine ();
-					_ai.Attack (_survivor.transform);
+				if (Vector3.Distance (transform.position, survivor.transform.position) < 2.0f) {
+                    state = MurdererAIState.ATTACK;
+                    ai.StopAIRoutine ();
+                    ai.Attack (survivor.transform);
 				}
-				if (_state == MurdererAIState.IDLE && isIdleEnd) {
-					isIdleEnd = false;
-					_state = MurdererAIState.PATROL;
-					_ai.StopAIRoutine ();
-					_ai.Patrol ();
+				if (state == MurdererAIState.IDLE && idleEnd) {
+                    idleEnd = false;
+                    state = MurdererAIState.PATROL;
+                    ai.StopAIRoutine ();
+                    ai.Patrol ();
 				}
-				if (_state == MurdererAIState.PATROL && Vector3.Distance (transform.position, _ai.currentPatPos.position) < 0.5f) {
-					_state = MurdererAIState.IDLE;
-					_ai.StopAIRoutine ();
-					_ai.Stop ();
+				if (state == MurdererAIState.PATROL && Vector3.Distance (transform.position, ai.GetTracePos().position) < 0.5f) {
+                    state = MurdererAIState.IDLE;
+                    ai.StopAIRoutine ();
+                    ai.Stop ();
 				}
-				if (_state == MurdererAIState.PATROL && (_survivor.playerState == Survivor.PlayerState.Run || _survivor.playerState == Survivor.PlayerState.Gram
-                    || _survivor.playerState == Survivor.PlayerState.Radio || _survivor.playerState == Survivor.PlayerState.Key)) {
-					_state = MurdererAIState.TRACE;
-					_ai.StopAIRoutine ();
-					_ai.tracePos.position = _survivor.transform.position;
-					_ai.Trace ();
+				if (state == MurdererAIState.PATROL && (survivor.playerState == Survivor.PlayerState.Run || survivor.playerState == Survivor.PlayerState.Gram
+                    || survivor.playerState == Survivor.PlayerState.Radio || survivor.playerState == Survivor.PlayerState.Key)) {
+                    state = MurdererAIState.TRACE;
+                    ai.StopAIRoutine ();
+                    ai.GetTracePos().position = survivor.transform.position;
+                    ai.Trace ();
 				}
-				if (_state == MurdererAIState.IDLE && (_survivor.playerState == Survivor.PlayerState.Run || _survivor.playerState == Survivor.PlayerState.Gram
-                    || _survivor.playerState == Survivor.PlayerState.Radio || _survivor.playerState == Survivor.PlayerState.Key)) {
-					_state = MurdererAIState.TRACE;
-					_ai.StopAIRoutine ();
-					_ai.tracePos.position = _survivor.transform.position;
-					_ai.Trace ();
+				if (state == MurdererAIState.IDLE && (survivor.playerState == Survivor.PlayerState.Run || survivor.playerState == Survivor.PlayerState.Gram
+                    || survivor.playerState == Survivor.PlayerState.Radio || survivor.playerState == Survivor.PlayerState.Key)) {
+                    state = MurdererAIState.TRACE;
+                    ai.StopAIRoutine ();
+                    ai.GetTracePos().position = survivor.transform.position;
+                    ai.Trace ();
 				}
-				if (_state == MurdererAIState.TRACE && Vector3.Distance (this.transform.position, _ai.tracePos.position) < 2f) {
-					_state = MurdererAIState.IDLE;
-					_ai.StopAIRoutine ();
-					_ai.Stop ();
+				if (state == MurdererAIState.TRACE && Vector3.Distance (this.transform.position, ai.GetTracePos().position) < 2f) {
+                    state = MurdererAIState.IDLE;
+                    ai.StopAIRoutine ();
+                    ai.Stop ();
 				}
 			}
 
@@ -113,10 +113,10 @@ public class Murderer_STATE : MonoBehaviour {
         StopAllCoroutines();
     }
 	public void OnIdleEnd(){
-		isIdleEnd = true;
+        idleEnd = true;
 	}
 	public void OnShoutEnd(){
-		_state = MurdererAIState.IDLE;
-		_ai.isAttacking = false;
+        state = MurdererAIState.IDLE;
+        ai.SetisAttacking(false);
 	}
 }
