@@ -23,25 +23,20 @@ public class Timmer : MonoBehaviour,IListener {
     }
     
     public void OnEvent(EVENT_TYPE Event_Type, Component Sender, object Param)
-    {
+	{
 
-        switch (Event_Type)
-        {
+		switch (Event_Type) {
 
-            case EVENT_TYPE.TIME_START:
+		case EVENT_TYPE.TIME_START:
                 
-                sw.Start();
-                isStart = true;
+			sw.Start ();
+			isStart = true;
                 
-                break;
+			break;
      
-        };
-    }
-
-
-    
-    
-    
+		}
+		;
+	}
     void Update()
     {
         if(textTime_murder == null)

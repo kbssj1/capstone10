@@ -40,6 +40,8 @@ public class Murderer_AI : MonoBehaviour, IListener {
 		damage = LevelManager.Instance.SetMurderDamageByLevel ();
         naviAgnt = GetComponent<NavMeshAgent> ();
         animator = GetComponent<Animator> ();
+		naviAgnt.speed = LevelManager.Instance.SetMurdererSpeedByLevel ();
+
 	}
 	IEnumerator Walk(){
 

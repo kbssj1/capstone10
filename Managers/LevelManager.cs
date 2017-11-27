@@ -18,7 +18,14 @@ public class LevelManager : MonoBehaviour {
 	public static int CurrentLevel
 	{
 		get { return currentLevel; }
-		set { currentLevel=value;}
+		set { if (value > 3) {
+				currentLevel = 3;
+			} else if (value < 1) {
+				currentLevel = 1;
+			} else {
+				currentLevel = value;
+			}
+			}
 	}
 	[Header("LEVEL")]
 	[SerializeField]
@@ -41,6 +48,9 @@ public class LevelManager : MonoBehaviour {
 	int level1Damage = 10;
 	int level2Damage = 15;
 	int level3Damage = 20;
+	float level1Speed = 3.0f;
+	float level2Speed = 3.5f;
+	float level3Speed = 2.5f;
 	void Awake () {
 		if (instance == null)
 		{
@@ -74,5 +84,16 @@ public class LevelManager : MonoBehaviour {
 			return 25;
 		}
 	}
-
+	public float SetMurdererSpeedByLevel(){
+		switch (currentLevel) {
+		case 1:
+			return level1Speed;
+		case 2:
+			return level2Speed;
+		case 3:
+			return level3Speed;
+		default:
+			return 3.5f;
+		}
+	}
 }
