@@ -38,6 +38,9 @@ public class LevelManager : MonoBehaviour {
 	float level1Time = 600f;
 	float level2Time = 450f;
 	float level3Time = 300f;
+	int level1Damage = 10;
+	int level2Damage = 15;
+	int level3Damage = 20;
 	void Awake () {
 		if (instance == null)
 		{
@@ -59,4 +62,17 @@ public class LevelManager : MonoBehaviour {
 			return 120f;
 		}
 	}
+	public int SetMurderDamageByLevel(){
+		switch (currentLevel) {
+		case 1:
+			return level1Damage;
+		case 2:
+			return level2Damage;
+		case 3:
+			return level3Damage;
+		default:
+			return 25;
+		}
+	}
+
 }

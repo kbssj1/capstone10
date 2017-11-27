@@ -5,7 +5,7 @@ using System.Collections.Generic;
 
 public class Murderer_AI : MonoBehaviour, IListener {
 
-    private const int murderAI_damage = 25;
+    
     private const string attackType1 = "Attack1";
     private const string attackType2 = "Attack2";
     private const string attackType3 = "Attack3";
@@ -37,7 +37,7 @@ public class Murderer_AI : MonoBehaviour, IListener {
         EventManager.Instance.AddListener(EVENT_TYPE.SURVIVOR_DIE, this);
         murder_state = GetComponent<Murderer_STATE>();
         attack = false;
-        damage = murderAI_damage;
+		damage = LevelManager.Instance.SetMurderDamageByLevel ();
         naviAgnt = GetComponent<NavMeshAgent> ();
         animator = GetComponent<Animator> ();
 	}
