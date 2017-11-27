@@ -759,9 +759,9 @@ public class Survivor : MonoBehaviour, IListener {
         survivor_audio.PlayAudio("ATTACKED", true);
         int damage = (int)Param;
         hp -= damage;
-        life.fillAmount = life.fillAmount - 0.25f;
+		life.fillAmount = life.fillAmount - ((float)damage/100f);
         hit = true;
-
+		UnityEngine.Debug.Log (hp);
         StateHit();
         yield return new WaitForSeconds(hitBreakTime);
         hit = false;
