@@ -9,7 +9,6 @@ public class Survivor : MonoBehaviour, IListener {
 
     private const int survivorInitHP = 100;
     private const float gaugeAdd = 19f;
-    private const float survivorInitSpeed = 1.5f;
     private const float hitBreakTime = 0.7f;
     private const float rotationInitSpeed = 50;
 
@@ -34,8 +33,8 @@ public class Survivor : MonoBehaviour, IListener {
     public CharacterController characterController;
     public Transform playerTr;
     private float speedRotation = rotationInitSpeed;
-    private float walkSpeed = survivorInitSpeed;
-    private float runSpeed = 3.0f;
+	private float walkSpeed;
+	private float runSpeed;
     private float speed = 1.5f;
 
     private Vector3 moveDirection = Vector3.zero;
@@ -75,6 +74,8 @@ public class Survivor : MonoBehaviour, IListener {
 
     void Initailize()
     {
+		runSpeed = LevelManager.Instance.SetSurvivorRunSpeedByLevel ();
+		walkSpeed = LevelManager.Instance.SetSurvivorWalkSpeedByLevel ();
         itemKey = false;
         die = false;
         run = false;
@@ -84,18 +85,13 @@ public class Survivor : MonoBehaviour, IListener {
         gram = false;
         radio = false;
         key = false;
-
         hp = survivorInitHP;
-
         playerState = PlayerState.Idle;
         state = 0;
         pv.synchronization = ViewSynchronization.UnreliableOnChange;
-
         pv.ObservedComponents[0] = this;
-
         currPos = playerTr.position;
         currRot = playerTr.rotation;
-
         gameStart = false;
         sw = new Stopwatch();
         etcAudio = GameObject.FindGameObjectWithTag("AUDIO").GetComponent<Etc_Audio>();
@@ -162,14 +158,6 @@ public class Survivor : MonoBehaviour, IListener {
                 {
                     run = false;
                 }
-                /*
-                if (Input.GetButtonDown("Fire1"))
-                {
-                    m_IsCrouch = !m_IsCrouch;
-                    survivor_audio.PlayAudio("CROUCH", true);
-                }
-                */
-
                 Vector3 desiredMove = transform.forward * vertical + transform.right * horizontal;
 
 
