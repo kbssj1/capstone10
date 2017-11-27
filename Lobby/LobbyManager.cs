@@ -14,6 +14,11 @@ public class LobbyManager : MonoBehaviour {
     void Awake()
     {
         PhotonNetwork.ConnectUsingSettings(version);
+		LevelManager.CurrentLevel = PlayerPrefs.GetInt (LevelManager.LevelKeyword);
+		if (LevelManager.CurrentLevel == 0) {
+			LevelManager.CurrentLevel = 1;
+		}
+		LevelManager.CurrentLevel = 3;
     }
 
     void OnConnectedToMaster()
