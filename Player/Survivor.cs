@@ -36,12 +36,11 @@ public class Survivor : MonoBehaviour, IListener {
 	private float walkSpeed;
 	private float runSpeed;
     private float speed = 1.5f;
-
     private Vector3 moveDirection = Vector3.zero;
     private float horizontal = 0f;
     private float vertical = 0f;
     private float rotate;
-
+	private float guageSpeed;
     [Header("Character Settings")]
     private bool die;
     private bool run;
@@ -76,6 +75,7 @@ public class Survivor : MonoBehaviour, IListener {
     {
 		runSpeed = LevelManager.Instance.SetSurvivorRunSpeedByLevel ();
 		walkSpeed = LevelManager.Instance.SetSurvivorWalkSpeedByLevel ();
+		guageSpeed = LevelManager.Instance.SetSurvivorGuageSpeedByLevel ();
         itemKey = false;
         die = false;
         run = false;
@@ -138,7 +138,7 @@ public class Survivor : MonoBehaviour, IListener {
     void Update()
     {
 
-        guage.fillAmount = (sw.ElapsedMilliseconds / 1000) / time;
+		guage.fillAmount = (sw.ElapsedMilliseconds / 1000) / time * guageSpeed;
 
         //Debug.Log(HeartBeat);
         if (IsCanMoving())

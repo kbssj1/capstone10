@@ -57,6 +57,9 @@ public class LevelManager : MonoBehaviour {
 	float level1SurvivorRunSpeed = 3.0f;
 	float level2SurvivorRunSpeed = 3.8f;
 	float level3SurvivorRunSpeed = 4.8f;
+	float level1SurvivorGuageSpeed = 1.0f;
+	float level2SurvivorGuageSpeed = 1.5f;
+	float level3SurvivorGuageSpeed = 2.0f;
 	void Awake () {
 		if (instance == null)
 		{
@@ -124,6 +127,18 @@ public class LevelManager : MonoBehaviour {
 			return level3SurvivorRunSpeed;
 		default:
 			return 1.5f;
+		}
+	}
+	public float SetSurvivorGuageSpeedByLevel(){
+		switch (currentLevel) {
+		case 1:
+			return level1SurvivorGuageSpeed;
+		case 2:
+			return level2SurvivorGuageSpeed;
+		case 3:
+			return level3SurvivorGuageSpeed;
+		default:
+			return 1.0f;
 		}
 	}
 }
