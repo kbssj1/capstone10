@@ -23,7 +23,8 @@ public class Murderer_AI : MonoBehaviour, IListener {
     private Murderer_STATE murder_state;
 	void Awake(){
 		Transform[] obj;
-		obj = GameObject.Find ("AI_Patrol_pos").transform.GetComponentsInChildren<Transform> ();
+		Debug.Log (transform.name);
+		obj = transform.parent.FindChild ("AI_Patrol_pos").transform.GetComponentsInChildren<Transform> ();
 		for (int i = 1; i < obj.Length-1; i++) {
 			patrolPos.Add (obj [i]);
 		}
