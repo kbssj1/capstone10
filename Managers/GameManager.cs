@@ -47,26 +47,17 @@ public class GameManager : MonoBehaviour {
             def = NetDef.Server;
             PhotonNetwork.Instantiate("Survivor", new Vector3(-18.21f, -17.611f, -7.43f), Quaternion.identity, 0);
 
-            if (!aIMode)
+            if (aIMode)
             {
-                AI = GameObject.FindGameObjectWithTag("MURDERER");
-                AI.SetActive(false);
+                //MuderAI를 생성한다
+				GameObject obj = Instantiate(Resources.Load("Murderer_AI")) as GameObject;
             }
-           
         }
 
         else
         {
             def = NetDef.Cliet;
             PhotonNetwork.Instantiate("Murderer", new Vector3(-11.64f, -17.52f, 7.28f), Quaternion.identity, 0);
-
-            if (!aIMode)
-            {
-                AI = GameObject.FindGameObjectWithTag("MURDERER");
-                AI.SetActive(false);
-                
-            }
-          
         }
         
     }
@@ -77,7 +68,6 @@ public class GameManager : MonoBehaviour {
 
         if (scene.name.Equals("MainScene"))
         {
-            
             CreateCharacter();
             PhotonNetwork.isMessageQueueRunning = true;
         }

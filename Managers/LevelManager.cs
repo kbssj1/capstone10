@@ -1,7 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-
+using System.Diagnostics;
 public class LevelManager : MonoBehaviour {
 
 	#region
@@ -22,7 +22,8 @@ public class LevelManager : MonoBehaviour {
 		get { return currentLevel; }
 		set { currentLevel=value;}
 	}
-
+	[Header("LEVEL")]
+	[SerializeField]
 	private static int currentLevel = 1;
 
 	#endregion
