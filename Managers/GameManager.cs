@@ -49,8 +49,9 @@ public class GameManager : MonoBehaviour {
 
             if (aIMode)
             {
-                //MuderAI를 생성한다
-				GameObject obj = Instantiate(Resources.Load("Murderer_AI")) as GameObject;
+				for (int i = 0; i < LevelManager.CurrentLevel; i++) { //레벨
+					GameObject obj = Instantiate (Resources.Load ("Murderer_AI")) as GameObject;
+				}
             }
         }
 

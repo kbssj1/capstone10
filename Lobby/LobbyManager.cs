@@ -18,7 +18,7 @@ public class LobbyManager : MonoBehaviour {
 		if (LevelManager.CurrentLevel == 0) {
 			LevelManager.CurrentLevel = 1;
 		}
-		//LevelManager.CurrentLevel = 3;
+		LevelManager.CurrentLevel = 3;
     }
 
     void OnConnectedToMaster()

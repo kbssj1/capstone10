@@ -21,8 +21,6 @@ public class Murderer_AI : MonoBehaviour, IListener {
     private bool attack;
     private int damage;
     private Murderer_STATE murder_state;
-
-    // test
 	void Awake(){
 		Transform[] obj;
 		obj = GameObject.Find ("AI_Patrol_pos").transform.GetComponentsInChildren<Transform> ();
