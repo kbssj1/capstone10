@@ -50,8 +50,6 @@ public class Murderer_AI : MonoBehaviour, IListener {
         naviAgnt.Stop ();
         naviAgnt.Resume();
         animator.SetTrigger ("Run");
-
-
         naviAgnt.SetDestination (tracePos.position);
 
         yield return null;
@@ -88,7 +86,7 @@ public class Murderer_AI : MonoBehaviour, IListener {
         
 		if (!isAttacking) {
 			isAttacking = true;
-            int tmpRandomAttackIndex = (int)Random.Range (1, 4);
+            int tmpRandomAttackIndex = (int)Random.Range (1, 3);
 			this.transform.LookAt (_survivor.position);
 			StartCoroutine ("Attack" + tmpRandomAttackIndex);
 		}
@@ -145,6 +143,9 @@ public class Murderer_AI : MonoBehaviour, IListener {
     {
         return tracePos;
     }
+	public Transform GetCurrentPosition(){
+		return currentPatPos;
+	}
     public void SetisAttacking(bool para)
     {
         isAttacking = para;

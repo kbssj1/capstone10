@@ -78,7 +78,7 @@ public class Murderer_STATE : MonoBehaviour {
                     ai.StopAIRoutine ();
                     ai.Patrol ();
 				}
-				if (state == MurdererAIState.PATROL && Vector3.Distance (transform.position, ai.GetTracePos().position) < 0.5f) {
+				if (state == MurdererAIState.PATROL && Vector3.Distance (transform.position, ai.GetCurrentPosition().position) < 0.5f) {
                     state = MurdererAIState.IDLE;
                     ai.StopAIRoutine ();
                     ai.Stop ();
