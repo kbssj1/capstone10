@@ -75,4 +75,7 @@ public class GameManager : MonoBehaviour {
         }
 
     }
+	void OnDestroy(){
+		PlayerPrefs.Save ();
+	}
 }
