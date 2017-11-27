@@ -513,7 +513,7 @@ public class Survivor : MonoBehaviour, IListener {
 
             case EVENT_TYPE.SURVIVOR_HIT:
 
-                if (pv.isMine && !hit && playerState != PlayerState.Die)
+                if (pv.isMine && playerState != PlayerState.Die)
                 {                   
                     StartCoroutine("Hit", Param);
                     pv.RPC("Hit", PhotonTargets.Others, Param);                  
@@ -803,8 +803,11 @@ public class Survivor : MonoBehaviour, IListener {
     public void SurvivorWin()
     {
         gameStart = false;
-        if(pv.isMine)
-            gameOver.GetComponentInChildren<Animator>().SetTrigger("WIN");
+		if (pv.isMine) {
+			gameOver.GetComponentInChildren<Animator> ().SetTrigger ("WIN");
+			PlayerPrefs.SetInt (LevelManager.LevelKeyword, LevelManager.CurrentLevel + 1);
+		}
+		
     }
     public void OnTimerEnd()
     {
