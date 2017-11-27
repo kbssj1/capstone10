@@ -1,6 +1,7 @@
 ﻿using UnityEngine;
 using System.Collections;
 using UnityEngine.AI;
+using System.Collections.Generic;
 
 public class Murderer_AI : MonoBehaviour, IListener {
 
@@ -9,8 +10,8 @@ public class Murderer_AI : MonoBehaviour, IListener {
     private const string attackType2 = "Attack2";
     private const string attackType3 = "Attack3";
     [SerializeField]
-	Transform[] patrolPos;
-
+	//Transform[] patrolPos;
+	List<Transform> patrolPos;
 	NavMeshAgent naviAgnt;
 	Animator animator;
 	private bool isAttacking = false;
@@ -21,8 +22,15 @@ public class Murderer_AI : MonoBehaviour, IListener {
     private int damage;
     private Murderer_STATE murder_state;
 
-   
-   
+    // test
+	void Awake(){
+		Transform[] obj;
+		obj = GameObject.Find ("AI_Patrol_pos").transform.GetComponentsInChildren<Transform> ();
+		for (int i = 1; i < obj.Length-1; i++) {
+			patrolPos.Add (obj [i]);
+		}
+		tracePos = obj [obj.Length - 1];
+	}
     // Use this for initialization
     void Start () {
         EventManager.Instance.AddListener(EVENT_TYPE.TIME_OVER, this);
@@ -40,7 +48,7 @@ public class Murderer_AI : MonoBehaviour, IListener {
         naviAgnt.Resume();
         animator.SetTrigger ("Walk");
 
-        int index = (int)Random.Range (0, patrolPos.Length);
+        int index = (int)Random.Range (0, patrolPos.Count);
 		currentPatPos = patrolPos [index];
         naviAgnt.SetDestination (patrolPos [index].position);
 
