@@ -6,9 +6,9 @@ using System.Collections.Generic;
 public class Murderer_AI : MonoBehaviour, IListener {
 
     
-    private const string attackType1 = "Attack1";
-    private const string attackType2 = "Attack2";
-    private const string attackType3 = "Attack3";
+    private const string firstattackType = "Attack1";
+    private const string secondattackType = "Attack2";
+    private const string lastattackType = "Attack3";
     [SerializeField]
 	//Transform[] patrolPos;
 	List<Transform> patrolPos;

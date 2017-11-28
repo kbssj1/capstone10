@@ -16,54 +16,55 @@ public class Murder_Audio : AudioController
         base.Init();
     }
 
-    public void PlayAudio(string audioName, bool isOneSound = false)
+    public void PlayAudio(string audioName, bool oneSound = false)
     {
         if (audioSource != null)
+            return;
+
+        if (oneSound == false)
         {
-            if (isOneSound == false)
+            switch (audioName)
             {
-                switch (audioName)
-                {
-                    case "RUN":
-                        audioSource.clip = Audio_Run;
-                        break;
-                    case "WALK":
-                        audioSource.clip = Audio_Walk;
-                        break;
-                    case "NOT":
-                        audioSource.clip = null;
-                        audioSource.Stop();
-                        break;
-                    default:
-                        Debug.LogError("잘못된 오디오 명을 입력하셨습니다.(Murder)");
-                        break;
-                }
-                PlayCurrentAudio();
+                case "RUN":
+                    audioSource.clip = Audio_Run;
+                    break;
+                case "WALK":
+                    audioSource.clip = Audio_Walk;
+                    break;
+                case "NOT":
+                    audioSource.clip = null;
+                    audioSource.Stop();
+                    break;
+                default:
+                    Debug.LogError("잘못된 오디오 명을 입력하셨습니다.(Murder)");
+                    break;
             }
-            else
-            {
-                switch (audioName)
-                {
-                    case "ATTACK":
-                        audioSource.clip = Audio_Attack_cry;
-                        playTime = 1.2f;
-                        break;
-                    case "DEATH":
-                        if (RepeatCheck_Death == true)
-                        {
-                            audioSource.clip = Audio_Death;
-                            RepeatCheck_Death = false;
-                            playTime = audioSource.clip.length;
-                        }
-                        break;
-                    default:
-                        Debug.LogError("잘못된 오디오 명을 입력하셨습니다.(Survivor)");
-                        break;
-                }
-                // PlayCurrentAudioRightly();             
-                if (audioSource.clip != null)
-                    StartCoroutine(TestAudio(playTime));
-            }
+            PlayCurrentAudio();
         }
+        else
+        {
+            switch (audioName)
+            {
+                case "ATTACK":
+                    audioSource.clip = Audio_Attack_cry;
+                    playTime = 1.2f;
+                    break;
+                case "DEATH":
+                    if (RepeatCheck_Death == true)
+                    {
+                        audioSource.clip = Audio_Death;
+                        RepeatCheck_Death = false;
+                        playTime = audioSource.clip.length;
+                    }
+                    break;
+                default:
+                    Debug.LogError("잘못된 오디오 명을 입력하셨습니다.(Survivor)");
+                    break;
+            }
+            // PlayCurrentAudioRightly();             
+            if (audioSource.clip != null)
+                StartCoroutine(TestAudio(playTime));
+        }
+        
     }
 }
