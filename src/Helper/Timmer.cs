@@ -14,32 +14,29 @@ public class Timmer : MonoBehaviour,IListener {
     public Text textTime_survi;
     GameObject murder;
     GameObject survi;
+	float timer;
     void Awake()
     {
         sw = new Stopwatch();
-        EventManager.Instance.AddListener(EVENT_TYPE.TIME_START, this);    
+        EventManager.Instance.AddListener(EVENT_TYPE.TIME_START, this);
+		timer = LevelManager.Instance.SetGameTimerByLevel ();
     }
     
     public void OnEvent(EVENT_TYPE Event_Type, Component Sender, object Param)
-    {
+	{
 
-        switch (Event_Type)
-        {
+		switch (Event_Type) {
 
-            case EVENT_TYPE.TIME_START:
+		case EVENT_TYPE.TIME_START:
                 
-                sw.Start();
-                isStart = true;
+			sw.Start ();
+			isStart = true;
                 
-                break;
+			break;
      
-        };
-    }
-
-
-    float timer=120;
-    
-    
+		}
+		;
+	}
     void Update()
     {
         if(textTime_murder == null)
