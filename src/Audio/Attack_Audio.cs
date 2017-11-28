@@ -14,12 +14,14 @@ public class Attack_Audio : AudioController
         base.Init();
     }
 
-    public void PlayAudio(string audioName, bool Rightly = false)
+    public void PlayAudio(string audioName, bool rightly = false)
     {
+
+        // return null
         if (audioSource != null)
             return null;
 
-        if (Rightly == false)
+        if (rightly == false)
         {
             switch (audioName)
             {
