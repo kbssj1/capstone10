@@ -16,7 +16,7 @@ public class Murder_Audio : AudioController
         base.Init();
     }
 
-    public void PlayAudio(string audioName, bool isPlayedAudioOnce = false)
+    public void PlayAudio(string audioName, bool playedAudioOnce = false)
     {
 		if (audioSource == null)
 			return;
@@ -24,26 +24,26 @@ public class Murder_Audio : AudioController
         {
 			switch (audioName) {
 			case "RUN":
-				if (!isPlayedAudioOnce) {
+				if (!playedAudioOnce) {
 					audioSource.clip = Audio_Run;
 					PlayCurrentAudio();
 				}
 				break;
 			case "WALK":
-				if (!isPlayedAudioOnce) {
+				if (!playedAudioOnce) {
 					audioSource.clip = Audio_Walk;
 					PlayCurrentAudio();
 				}
 				break;
 			case "NOT":
-				if (!isPlayedAudioOnce) {
+				if (!playedAudioOnce) {
 					audioSource.clip = null;
 					audioSource.Stop();
 					PlayCurrentAudio();
 				}
 				break;
 			case "ATTACK":
-				if (isPlayedAudioOnce) {
+				if (playedAudioOnce) {
 					audioSource.clip = Audio_Attack_cry;
 					playTime = 1.2f;
 					if (audioSource.clip != null)
@@ -51,7 +51,7 @@ public class Murder_Audio : AudioController
 				}
 				break;
 			case "DEATH":
-				if (isPlayedAudioOnce) {
+				if (playedAudioOnce) {
 					if (RepeatCheck_Death == true)
 					{
 						audioSource.clip = Audio_Death;
