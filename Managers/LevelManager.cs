@@ -18,13 +18,10 @@ public class LevelManager : MonoBehaviour {
 	public static int CurrentLevel
 	{
 		get { return currentLevel; }
-		set { if (value > 3) {
-				currentLevel = 3;
-			} else if (value < 1) {
-				currentLevel = 1;
-			} else {
-				currentLevel = value;
-			}
+		set { 
+			 if ( value > 3 ) value = 3;
+			 else if ( value < 1) value = 1;
+			 currentLevel = value;
 			}
 	}
 	[Header("LEVEL")]
