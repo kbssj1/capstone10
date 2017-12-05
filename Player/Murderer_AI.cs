@@ -6,9 +6,9 @@ using System.Collections.Generic;
 public class Murderer_AI : MonoBehaviour, IListener {
 
     
-    private const string attackType1 = "Attack1";
-    private const string attackType2 = "Attack2";
-    private const string attackType3 = "Attack3";
+	private const string attackLeftType = "Attack1";
+    private const string attackRightType = "Attack2";
+    private const string attackFrontType = "Attack3";
     [SerializeField]
 	//Transform[] patrolPos;
 	List<Transform> patrolPos;
@@ -65,17 +65,17 @@ public class Murderer_AI : MonoBehaviour, IListener {
 	}
 	IEnumerator Attack1(){
         naviAgnt.Stop ();
-        animator.SetTrigger (attackType1);
+		animator.SetTrigger (attackLeftType);
 		yield return null;
 	}
 	IEnumerator Attack2(){
         naviAgnt.Stop ();
-        animator.SetTrigger (attackType2);
+		animator.SetTrigger (attackRightType);
 		yield return null;
 	}
 	IEnumerator Attack3(){
         naviAgnt.Stop ();
-        animator.SetTrigger (attackType3);
+		animator.SetTrigger (attackFrontType);
 		yield return null;
 	}
 	IEnumerator Idle(){
