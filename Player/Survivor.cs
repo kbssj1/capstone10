@@ -158,8 +158,16 @@ public class Survivor : MonoBehaviour, IListener {
                 {
                     run = false;
                 }
-                Vector3 desiredMove = transform.forward * vertical + transform.right * horizontal;
 
+                Vector3 desiredMove = transform.forward * vertical + transform.right * horizontal;
+				//카메라  상하이동
+				if (Input.GetAxis("Oculus_GearVR_DpadX") != 0)
+				{
+					float inputScroll = Input.GetAxis("Oculus_GearVR_DpadX");
+					float roy = inputScroll * 60 * Time.deltaTime;
+					mainCamera.transform.Rotate(roy, 0, 0);
+
+				}
 
                 moveDirection.x = desiredMove.x * speed;
                 moveDirection.y -= 9.8f;
