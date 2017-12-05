@@ -14,47 +14,39 @@ public class Attack_Audio : AudioController
         base.Init();
     }
 
-    public void PlayAudio(string audioName, bool Rightly = false)
+    public void PlayAudio(string audioName, bool playedAudioRightly = false)
     {
-        if (audioSource != null)
+		if (audioSource == null)
+			return;
+		else
         {
-            if (Rightly == false)
-            {
-                switch (audioName)
-                {
-                    case "NORMAL":
-                        audioSource.clip = audio_Attack_Normal;
-                        break;
-                    default:
-                        Debug.LogError("잘못된 오디오 명을 입력하셨습니다.(Attack)");
-                        break;
-                }
-                //PlayCurrentAudioRightly();
 
-                PlayCurrentAudio();
-
-            }
-            else
-            {
-                switch (audioName)
-                {
-                    case "START":                      
-                        audioSource.clip = audio_Attack_Start;
-                        if (audioSource.clip != null)
-                            StartCoroutine(TestAudio(audioSource.clip.length));
-                        break;
-                    case "ATTACK":
-                        audioSource.clip = audio_Attack_Attack;
-                        if (audioSource.clip != null)
-                            StartCoroutine(TestAudio(1.2f));
-                        break;
-                    default:
-                        Debug.LogError("잘못된 오디오 명을 입력하셨습니다.(Attack)");
-                        break;
-                }
-                
-                
-            }
+			switch (audioName) {
+			case "NORMAL":
+				if (!playedAudioRightly) {
+					audioSource.clip = audio_Attack_Normal;
+					PlayCurrentAudio();
+				}
+				break;
+			case "START":
+				if (playedAudioRightly) {
+					audioSource.clip = audio_Attack_Start;
+					if (audioSource.clip != null)
+						StartCoroutine (TestAudio (audioSource.clip.length));
+				}
+				break;
+			case "ATTACK":
+				if (playedAudioRightly) {
+					audioSource.clip = audio_Attack_Attack;
+					if (audioSource.clip != null)
+						StartCoroutine (TestAudio (1.2f));
+				}
+				break;
+			default:
+				Debug.LogError("잘못된 오디오 명을 입력하셨습니다.(Attack)");
+				break;
+			}
+				
         }       
     }
 }
