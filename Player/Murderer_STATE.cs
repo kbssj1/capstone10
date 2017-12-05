@@ -46,7 +46,7 @@ public class Murderer_STATE : MonoBehaviour {
 		}
         #region
 
-        if (ai.IsAni().GetCurrentAnimatorStateInfo(0).IsName("Walk"))
+		if (ai.IsAni().GetCurrentAnimatorStateInfo(0).IsName("Walk"))
         {
             murder_Audio.PlayAudio("WALK");
         }
@@ -72,30 +72,34 @@ public class Murderer_STATE : MonoBehaviour {
                     ai.StopAIRoutine ();
                     ai.Attack (survivor.transform);
 				}
-				if (state == MurdererAIState.IDLE && idleEnd) {
-                    idleEnd = false;
-                    state = MurdererAIState.PATROL;
-                    ai.StopAIRoutine ();
-                    ai.Patrol ();
+				if (state == MurdererAIState.IDLE ) {
+					if(idleEnd){
+						idleEnd = false;
+						state = MurdererAIState.PATROL;
+						ai.StopAIRoutine ();
+						ai.Patrol ();
+					}
+					else if((survivor.playerState == Survivor.PlayerState.Run || survivor.playerState == Survivor.PlayerState.Gram
+						|| survivor.playerState == Survivor.PlayerState.Radio || survivor.playerState == Survivor.PlayerState.Key)){
+						state = MurdererAIState.TRACE;
+						ai.StopAIRoutine ();
+						ai.GetTracePos().position = survivor.transform.position;
+						ai.Trace ();
+					}
 				}
-				if (state == MurdererAIState.PATROL && Vector3.Distance (transform.position, ai.GetCurrentPosition().position) < 0.5f) {
-                    state = MurdererAIState.IDLE;
-                    ai.StopAIRoutine ();
-                    ai.Stop ();
-				}
-				if (state == MurdererAIState.PATROL && (survivor.playerState == Survivor.PlayerState.Run || survivor.playerState == Survivor.PlayerState.Gram
-                    || survivor.playerState == Survivor.PlayerState.Radio || survivor.playerState == Survivor.PlayerState.Key)) {
-                    state = MurdererAIState.TRACE;
-                    ai.StopAIRoutine ();
-                    ai.GetTracePos().position = survivor.transform.position;
-                    ai.Trace ();
-				}
-				if (state == MurdererAIState.IDLE && (survivor.playerState == Survivor.PlayerState.Run || survivor.playerState == Survivor.PlayerState.Gram
-                    || survivor.playerState == Survivor.PlayerState.Radio || survivor.playerState == Survivor.PlayerState.Key)) {
-                    state = MurdererAIState.TRACE;
-                    ai.StopAIRoutine ();
-                    ai.GetTracePos().position = survivor.transform.position;
-                    ai.Trace ();
+				if (state == MurdererAIState.PATROL) {
+					if(Vector3.Distance (transform.position, ai.GetCurrentPosition().position) < 0.5f){
+						state = MurdererAIState.IDLE;
+						ai.StopAIRoutine ();
+						ai.Stop ();
+					}
+					else if((survivor.playerState == Survivor.PlayerState.Run || survivor.playerState == Survivor.PlayerState.Gram
+						|| survivor.playerState == Survivor.PlayerState.Radio || survivor.playerState == Survivor.PlayerState.Key)){
+						state = MurdererAIState.TRACE;
+						ai.StopAIRoutine ();
+						ai.GetTracePos().position = survivor.transform.position;
+						ai.Trace ();
+					}
 				}
 				if (state == MurdererAIState.TRACE && Vector3.Distance (this.transform.position, ai.GetTracePos().position) < 2f) {
                     state = MurdererAIState.IDLE;
